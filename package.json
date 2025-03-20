@@ -24,7 +24,12 @@
   },
   "keywords": [
     "@typescript-package",
-    "@typescript-package/history"
+    "@typescript-package/history",
+    "HistoryAppend",
+    "HistoryPrepend",
+    "History",
+    "Undo",
+    "Redo"
   ],
   "funding": [
     {
