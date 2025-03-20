@@ -1,7 +1,7 @@
 // Abstract.
-import { HistoryPrepend } from './history-prepend.abstract';
-import { HistoryAppend } from './history-append.abstract';
-import { HistoryPeek as AbstractHistoryPeek } from './peek/history-peek.abstract';
+import { HistoryPeek } from './peek';
+import { RedoHistory } from './redo-history.class';
+import { UndoHistory } from './undo-history.class';
 /**
  * @description The class to manage the value changes.
  * @export
@@ -119,9 +119,9 @@ export abstract class History<Type, Size extends number = number> {
    * @param {Size} param0.size 
    */
   constructor({value, size}: {value?: Type, size?: Size} = {}) {
-    this.#peek = new class HistoryPeek<Type> extends AbstractHistoryPeek<Type>{}(this);
-    this.#redo = new class RedoHistory<Type = any, Size extends number = number> extends HistoryPrepend<Type, Size>{}(Infinity);
-    this.#undo = new class UndoHistory<Type = any, Size extends number = number> extends HistoryAppend<Type, Size>{}(size || History.size);
+    this.#peek = new HistoryPeek<Type>(this);
+    this.#redo = new RedoHistory<Type>(Infinity);
+    this.#undo = new UndoHistory<Type, Size>(size || History.size as Size);
     Object.hasOwn(arguments[0] || {}, 'value') && ((this.#hasSetBeenCalled = true), (this.#current = {value}));
   }
 
@@ -288,9 +288,9 @@ export abstract class History<Type, Size extends number = number> {
     const redo = this.#redo;
     if (redo.get()?.length) {
       const value = redo.take();
-      this.#undo.add(this.#current.value);
+      this.#undo.add(this.#current.value as Type);
       this.#current = {value};
-      this.#onRedoCallback?.(value);
+      this.#onRedoCallback?.(value as Type);
     }
     return this;
   }
@@ -302,7 +302,7 @@ export abstract class History<Type, Size extends number = number> {
    * @returns {this} The current instance.
    */
   public set(value: Type): this {
-    this.#hasSetBeenCalled === true && this.#undo.add(this.#current.value);
+    this.#hasSetBeenCalled === true && this.#undo.add(this.#current.value as Type);
     this.#current = {value};
     this.#redo.clear();
     this.#hasSetBeenCalled === false && (this.#hasSetBeenCalled = true);
@@ -318,9 +318,9 @@ export abstract class History<Type, Size extends number = number> {
     const undo = this.#undo;
     if (undo.get()?.length) {
       const value = undo.take();
-      this.#redo.add(this.#current.value);
+      this.#redo.add(this.#current.value as Type);
       this.#current = {value};
-      this.#onUndoCallback?.(value);
+      this.#onUndoCallback?.(value as Type);
     }
     return this;
   }
