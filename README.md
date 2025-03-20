@@ -54,7 +54,8 @@ import {
 import { History } from '@typescript-package/history';
 
 // Initialize.
-const history = new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size>{}({value: 5, size: 5});
+const history = new class History<Type, Size extends number = number>
+  extends AbstractHistory<Type, Size>{}({value: 5, size: 5});
 
 console.group(`History README.md`);
 
@@ -105,19 +106,49 @@ console.groupEnd();
 ## `HistoryAppend`
 
 ```typescript
-import { History } from '@typescript-package/history';
+import { HistoryAppend as AbstractHistoryAppend } from '@typescript-package/history';
+
+export const historyAppend = new class HistoryAppend<Type = number, Size extends number = number>
+  extends AbstractHistoryAppend<Type, Size>{}();
+
+// Add to the history.
+console.log(`add`, 127, 227);
+historyAppend.add(127).add(227);
+console.log(historyAppend.get()); // [127, 227]
+
+// Peek.
+console.log(`peekLast()`, historyAppend.peekLast()); // Outputs: 127
+console.log(`peekNext()`, historyAppend.peekNext()); // Outputs: 227
+
+// Take from the history.
+console.log(historyAppend.take()); // Outputs: 227
+console.log(historyAppend.get()); // Outputs: [127]
 ```
 
 ## `HistoryCore`
 
-```typescript
-import { History } from '@typescript-package/history';
-```
+The core class for history append and prepend.
 
 ## `HistoryPrepend`
 
 ```typescript
-import { History } from '@typescript-package/history';
+import { History as AbstractHistoryPrepend } from '@typescript-package/history';
+
+export const historyPrepend = new class HistoryPrepend<Type = number, Size extends number = number>
+  extends AbstractHistoryPrepend<Type, Size>{}();
+
+// Add to the history.
+console.log(`add`, 127, 327, 227);
+historyPrepend.add(127).add(327).add(227);
+console.log(historyPrepend.get()); // [227, 327, 127]
+
+// Peek.
+console.log(`peekLast()`, historyPrepend.peekLast()); // Outputs: 127
+console.log(`peekNext()`, historyPrepend.peekNext()); // Outputs: 227
+
+// Take from the history.
+console.log(historyPrepend.take()); // 227
+console.log(historyPrepend.get()); // [327, 127]
 ```
 
 ## Contributing
