@@ -1,3 +1,3 @@
-export { HistoryPeek } from './history-peek.abstract';
-export { RedoHistoryPeek } from './redo-history-peek.abstract';
-export { UndoHistoryPeek } from './undo-history-peek.abstract';
+export { HistoryPeek } from './history-peek.class';
+export { RedoHistoryPeek } from './redo-history-peek.class';
+export { UndoHistoryPeek } from './undo-history-peek.class';

@@ -1,7 +1,7 @@
 // Abstract.
 import { History } from "../history.abstract";
-import { RedoHistoryPeek as AbstractRedoHistoryPeek } from "./redo-history-peek.abstract";
-import { UndoHistoryPeek as AbstractUndoHistoryPeek } from "./undo-history-peek.abstract";
+import { RedoHistoryPeek } from "./redo-history-peek.class";
+import { UndoHistoryPeek } from "./undo-history-peek.class";
 /**
  * @description
  * @export
@@ -49,7 +49,7 @@ export class HistoryPeek<Type> {
    * @param {History<Type>} history 
    */
   constructor(history: History<Type>) {
-    this.#redo = new class RedoHistoryPeek<Type> extends AbstractRedoHistoryPeek<Type>{}(history);
-    this.#undo = new class UndoHistoryPeek<Type> extends AbstractUndoHistoryPeek<Type>{}(history);
+    this.#redo = new RedoHistoryPeek(history);
+    this.#undo = new UndoHistoryPeek(history);
   }
 }
