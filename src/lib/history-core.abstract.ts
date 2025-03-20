@@ -1,5 +1,5 @@
 /**
- * @description 
+ * @description The core class for history append and prepend.
  * @export
  * @abstract
  * @class HistoryCore
