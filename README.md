@@ -132,7 +132,7 @@ The core class for history append and prepend.
 ## `HistoryPrepend`
 
 ```typescript
-import { History as AbstractHistoryPrepend } from '@typescript-package/history';
+import { HistoryPrepend as AbstractHistoryPrepend } from '@typescript-package/history';
 
 export const historyPrepend = new class HistoryPrepend<Type = number, Size extends number = number>
   extends AbstractHistoryPrepend<Type, Size>{}();
