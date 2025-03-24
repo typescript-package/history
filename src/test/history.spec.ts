@@ -1,11 +1,11 @@
 import { History as AbstractHistory } from "../lib";
+import { WeakData } from '@typescript-package/data';
 
-
-let history = new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size>{}({value: 5, size: 5});
+let history = new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
 
 describe(`History`, () => {
   beforeEach(() => {
-    history = new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size>{}({value: 5, size: 5});
+    history = new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
   });
 
   it(`set()`, () => {
