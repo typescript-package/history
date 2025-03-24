@@ -1,4 +1,10 @@
-// Abstract.
+import {
+  // Class.
+  Data,
+  // Abstract.
+  DataCore
+} from '@typescript-package/data';
+// Class.
 import { HistoryPeek } from './peek';
 import { RedoHistory } from './redo-history.class';
 import { UndoHistory } from './undo-history.class';
@@ -9,8 +15,13 @@ import { UndoHistory } from './undo-history.class';
  * @class History
  * @template Type 
  * @template {number} [Size=number] 
+ * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
  */
-export abstract class History<Type, Size extends number = number> {
+export abstract class History<
+  Type,
+  Size extends number = number,
+  Storage extends DataCore<Type[]> = Data<Type[]>
+> {
   /**
    * @description The max size for undo history.
    * @public
@@ -118,10 +129,13 @@ export abstract class History<Type, Size extends number = number> {
    * @param {Type} param0.value 
    * @param {Size} param0.size 
    */
-  constructor({value, size}: {value?: Type, size?: Size} = {}) {
+  constructor(
+    {value, size}: {value?: Type, size?: Size} = {},
+    storage: new (value: Type[]) => Storage = Data as any
+  ) {
     this.#peek = new HistoryPeek<Type>(this);
-    this.#redo = new RedoHistory<Type>(Infinity);
-    this.#undo = new UndoHistory<Type, Size>(size || History.size as Size);
+    this.#redo = new RedoHistory<Type, number, Storage>(Infinity, storage);
+    this.#undo = new UndoHistory<Type, Size, Storage>(size || History.size as Size, storage);
     Object.hasOwn(arguments[0] || {}, 'value') && ((this.#hasSetBeenCalled = true), (this.#current = {value}));
   }
 
@@ -189,6 +203,15 @@ export abstract class History<Type, Size extends number = number> {
    */
   public hasCurrent() {
     return Object.hasOwn(this.#current, 'value');
+  }
+
+  /**
+   * @description Checks whether the history is enabled by checking undo size.
+   * @public
+   * @returns {boolean} 
+   */
+  public isEnabled(): boolean {
+    return (this.undoHistory.size > 0 ? true : false) === true;
   }
 
   /**
@@ -306,6 +329,16 @@ export abstract class History<Type, Size extends number = number> {
     this.#current = {value};
     this.#redo.clear();
     this.#hasSetBeenCalled === false && (this.#hasSetBeenCalled = true);
+    return this;
+  }
+
+  /**
+   * @description Sets the size of undo history.
+   * @public
+   * @param {Size} size The maximum size for undo history.
+   */
+  public setSize(size: Size): this {
+    this.undoHistory.setSize(size);
     return this;
   }
 

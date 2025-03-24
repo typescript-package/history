@@ -1,3 +1,9 @@
+import {
+  // Class.
+  Data,
+  // Abstract.
+  DataCore
+} from '@typescript-package/data';
 // Abstract.
 import { HistoryCore } from './history-core.abstract';
 /**
@@ -8,8 +14,14 @@ import { HistoryCore } from './history-core.abstract';
  * @class HistoryPrepend
  * @template Type 
  * @template {number} [Size=number] 
+ * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
+ * @extends {HistoryCore<Type, Size, Storage>}
  */
-export abstract class HistoryPrepend<Type, Size extends number = number> extends HistoryCore<Type, Size> {
+export abstract class HistoryPrepend<
+  Type,
+  Size extends number = number,
+  Storage extends DataCore<Type[]> = Data<Type[]>
+> extends HistoryCore<Type, Size, Storage> {
   /**
    * @description The default value of maximum history size.
    * @public
@@ -32,9 +44,13 @@ export abstract class HistoryPrepend<Type, Size extends number = number> extends
    * Creates an instance of `HistoryPrepend` child class.
    * @constructor
    * @param {Size} [size=HistoryPrepend.size as Size] 
+   * @param {new (value: Type[]) => Storage} [storage=Data as Storage] 
    */
-  constructor(size: Size = HistoryPrepend.size as Size) {
-    super(size);
+  constructor(
+    size: Size = HistoryPrepend.size as Size,
+    storage: new (value: Type[]) => Storage = Data as any
+  ) {
+    super(size, storage);
   }
 
   /**
@@ -46,7 +62,7 @@ export abstract class HistoryPrepend<Type, Size extends number = number> extends
   public add(value: Type): this {
     const history = super.history;
     history.length >= super.size && history.pop();
-    history.unshift(value);
+    super.size > 0 && history.unshift(value);
     return this;
   }
 

@@ -1,3 +1,9 @@
+import {
+  // Class.
+  Data,
+  // Abstract.
+  DataCore
+} from '@typescript-package/data';
 // Abstract.
 import { HistoryCore } from './history-core.abstract';
 /**
@@ -9,8 +15,14 @@ import { HistoryCore } from './history-core.abstract';
  * @class HistoryAppend
  * @template Type 
  * @template {number} [Size=number] 
+ * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
+ * @extends {HistoryCore<Type, Size, Storage>}
  */
-export abstract class HistoryAppend<Type, Size extends number = number> extends HistoryCore<Type, Size> {
+export abstract class HistoryAppend<
+  Type,
+  Size extends number = number,
+  Storage extends DataCore<Type[]> = Data<Type[]>
+> extends HistoryCore<Type, Size, Storage> {
   /**
    * @description The default value of maximum history size.
    * @public
@@ -34,8 +46,11 @@ export abstract class HistoryAppend<Type, Size extends number = number> extends 
    * @constructor
    * @param {Size} [size=HistoryAppend.size as Size] 
    */
-  constructor(size: Size = HistoryAppend.size as Size) {
-    super(size);
+  constructor(
+    size: Size = HistoryAppend.size as Size,
+    storage: new (value: Type[]) => Storage = Data as any
+  ) {
+    super(size, storage);
   }
 
   /**
@@ -47,7 +62,7 @@ export abstract class HistoryAppend<Type, Size extends number = number> extends 
   public add(value: Type): this {
     const history = super.history;
     history.length >= super.size && history.shift();
-    history.push(value);
+    super.size > 0 && history.push(value);
     return this;
   }
 

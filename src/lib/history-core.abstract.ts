@@ -1,3 +1,11 @@
+import {
+// Class.
+  Data,
+  // Abstract.
+  DataCore
+} from '@typescript-package/data';
+// Abstract.
+import { HistoryStorage } from './history-storage.abstract';
 /**
  * @description The core class for history append and prepend.
  * @export
@@ -5,23 +13,21 @@
  * @class HistoryCore
  * @template Type 
  * @template {number} [Size=number] 
+ * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
+ * @extends {HistoryStorage<Type, Storage>}
  */
-export abstract class HistoryCore<Type, Size extends number = number> {
-  /**
-   * @description A private property for history of `WeakMap` type.
-   * @static
-   * @readonly
-   * @type {WeakMap}
-   */
-  static readonly #history = new WeakMap<any, any[]>();
-
+export abstract class HistoryCore<
+  Type,
+  Size extends number = number,
+  Storage extends DataCore<Type[]> = Data<Type[]>
+> extends HistoryStorage<Type, Storage> {
   /**
    * @description Returns the `string` tag representation of the `HistoryCore` class when used in `Object.prototype.toString.call(instance)`.
    * @public
    * @readonly
    * @type {string}
    */
-  public get [Symbol.toStringTag](): string {
+  public override get [Symbol.toStringTag](): string {
     return HistoryCore.name;
   }
   
@@ -32,17 +38,7 @@ export abstract class HistoryCore<Type, Size extends number = number> {
    * @type {Type[]}
    */
   protected get history(): Type[] {
-    return HistoryCore.#history.get(this) as Type[];
-  }
-
-  /**
-   * @description The length of the history.
-   * @public
-   * @readonly
-   * @type {number}
-   */
-  public get length(): number {
-    return this.history.length;
+    return super.value;
   }
 
   /**
@@ -66,8 +62,11 @@ export abstract class HistoryCore<Type, Size extends number = number> {
    * @constructor
    * @param {Size} size 
    */
-  constructor(size: Size) {
-    this.#initialize();
+  constructor(
+    size: Size,
+    storage: new (value: Type[]) => Storage
+  ) {
+    super([], storage);
     this.#size = size;
   }
 
@@ -88,25 +87,6 @@ export abstract class HistoryCore<Type, Size extends number = number> {
     const history = this.history;
     history.length = 0;
     return this;
-  }
-
-  /**
-   * @description Destroys the history of this instance.
-   * @public
-   * @returns {this} The current instance.
-   */
-  public destroy(): this {
-    HistoryCore.#history.delete(this);
-    return this;
-  }
-
-  /**
-   * @description Gets the history.
-   * @public
-   * @returns {Readonly<Type[]>} 
-   */
-  public get(): Readonly<Type[]> {
-    return this.history;
   }
 
   /**
@@ -136,20 +116,21 @@ export abstract class HistoryCore<Type, Size extends number = number> {
   public abstract peekNext(): Type | undefined;
 
   /**
+   * @description Sets the size for history.
+   * @public
+   * @param {Size} size 
+   * @returns {this} 
+   */
+  public setSize(size: Size): this {
+    this.#size = size;
+    return this;
+  }
+
+  /**
    * @description Takes the first value.
    * @public
    * @abstract
    * @returns {(Type | undefined)} 
    */
   public abstract take(): Type | undefined;
-
-  /**
-   * @description Initializes the history by setting an empty `Array`.
-   * @private
-   * @returns {this} The current instance.
-   */
-  #initialize(): this {
-    HistoryCore.#history.set(this, []);
-    return this;
-  }
 }
