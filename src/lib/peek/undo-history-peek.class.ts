@@ -1,5 +1,5 @@
 // Abstract.
-import { History } from '../history.abstract';
+import { History } from '../history.class';
 /**
  * @description The class 
  * @export

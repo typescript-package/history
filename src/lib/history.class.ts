@@ -11,13 +11,12 @@ import { UndoHistory } from './undo-history.class';
 /**
  * @description The class to manage the value changes.
  * @export
- * @abstract
  * @class History
  * @template Type 
  * @template {number} [Size=number] 
  * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
  */
-export abstract class History<
+export class History<
   Type,
   Size extends number = number,
   Storage extends DataCore<Type[]> = Data<Type[]>

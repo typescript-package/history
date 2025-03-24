@@ -1,4 +1,4 @@
-export { History } from './history.abstract';
+export { History } from './history.class';
 export { HistoryAppend } from './history-append.abstract';
 export { HistoryCore } from './history-core.abstract';
 export { HistoryStorage } from './history-storage.abstract';

@@ -1,5 +1,5 @@
 // Abstract.
-import { History } from "../history.abstract";
+import { History } from "../history.class";
 import { RedoHistoryPeek } from "./redo-history-peek.class";
 import { UndoHistoryPeek } from "./undo-history-peek.class";
 /**
