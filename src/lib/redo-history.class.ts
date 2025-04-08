@@ -10,13 +10,13 @@ import { HistoryPrepend } from './history-prepend.abstract';
  * @description Manages the redo history with prepend mechanism.
  * @export
  * @class RedoHistory
- * @template [Type=any] The type of elements stored in the history
+ * @template [Value=any] The type of elements stored in the history
  * @template {number} [Size=number] The maximum size of the history.
- * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
- * @extends {HistoryPrepend<Type, Size, Storage>}
+ * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
+ * @extends {HistoryPrepend<Value, Size, DataType>}
  */
 export class RedoHistory<
-  Type = any,
+  Value = any,
   Size extends number = number,
-  Storage extends DataCore<Type[]> = Data<Type[]>
-> extends HistoryPrepend<Type, Size, Storage>{};
+  DataType extends DataCore<Value[]> = Data<Value[]>
+> extends HistoryPrepend<Value, Size, DataType>{};
