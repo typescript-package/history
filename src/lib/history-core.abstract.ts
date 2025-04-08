@@ -13,14 +13,14 @@ import { HistoryStorage } from './history-storage.abstract';
  * @class HistoryCore
  * @template Type 
  * @template {number} [Size=number] 
- * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
- * @extends {HistoryStorage<Type, Storage>}
+ * @template {DataCore<Type[]>} [DataType=Data<Type[]>] 
+ * @extends {HistoryStorage<Type, DataType>}
  */
 export abstract class HistoryCore<
   Type,
   Size extends number = number,
-  Storage extends DataCore<Type[]> = Data<Type[]>
-> extends HistoryStorage<Type, Storage> {
+  DataType extends DataCore<Type[]> = Data<Type[]>
+> extends HistoryStorage<Type, DataType> {
   /**
    * @description Returns the `string` tag representation of the `HistoryCore` class when used in `Object.prototype.toString.call(instance)`.
    * @public
@@ -64,9 +64,9 @@ export abstract class HistoryCore<
    */
   constructor(
     size: Size,
-    storage: new (value: Type[]) => Storage
+    data: new (value: Type[]) => DataType
   ) {
-    super([], storage);
+    super([], data);
     this.#size = size;
   }
 
