@@ -5,7 +5,7 @@ import {
   DataCore
 } from '@typescript-package/data';
 // Abstract.
-import { HistoryPrepend } from '../history-prepend.abstract';
+import { HistoryPrepend } from '../core';
 /**
  * @description Manages the redo history with prepend mechanism.
  * @export

@@ -1,5 +1,5 @@
 import { Data, DataCore } from '@typescript-package/data';
-import { HistoryStorage } from '../history-storage.abstract';
+import { HistoryStorage } from '../core';
 
 export class CurrentHistory<
   Value,
