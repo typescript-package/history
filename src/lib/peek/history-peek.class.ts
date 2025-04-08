@@ -13,7 +13,7 @@ export class HistoryPeek<Type> {
    * @description
    * @public
    * @readonly
-   * @type {*}
+   * @type {RedoHistoryPeek<Type>}
    */
   public get redo() {
     return this.#redo;
@@ -23,7 +23,7 @@ export class HistoryPeek<Type> {
    * @description
    * @public
    * @readonly
-   * @type {*}
+   * @type {UndoHistoryPeek<Type>}
    */
   public get undo() {
     return this.#undo;
@@ -32,16 +32,16 @@ export class HistoryPeek<Type> {
   /**
    * @description
    * @readonly
-   * @type {*}
+   * @type {RedoHistoryPeek<Type}
    */
-  readonly #undo;
+  readonly #redo;
 
   /**
    * @description
    * @readonly
-   * @type {*}
+   * @type {UndoHistoryPeek<Type}
    */
-  readonly #redo;
+  readonly #undo;
 
   /**
    * Creates an instance of `HistoryPeek`.
