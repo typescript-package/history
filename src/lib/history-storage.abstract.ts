@@ -9,14 +9,14 @@ import {
  * @export
  * @abstract
  * @class HistoryStorage
- * @template Type 
- * @template {DataCore<Type[]>} [Storage=Data<Type[]>] 
- * @extends {DataCore<Type[]>}
+ * @template Value 
+ * @template {DataCore<Value[]>} [Type=Data<Value[]>] 
+ * @extends {DataCore<Value[]>}
  */
 export abstract class HistoryStorage<
-  Type,
-  Storage extends DataCore<Type[]> = Data<Type[]>
-> extends DataCore<Type[]> {
+  Value,
+  Type extends DataCore<Value[]> = Data<Value[]>
+> extends DataCore<Value[]> {
   /**
    * @description Returns the `string` tag representation of the `HistoryStorage` class when used in `Object.prototype.toString.call(instance)`.
    * @public
@@ -25,6 +25,16 @@ export abstract class HistoryStorage<
    */
   public override get [Symbol.toStringTag](): string {
     return HistoryStorage.name;
+  }
+
+  /**
+   * @description
+   * @public
+   * @readonly
+   * @type {Type}
+   */
+  public get data() {
+    return this.#data;
   }
 
   /**
@@ -41,34 +51,34 @@ export abstract class HistoryStorage<
    * @description
    * @public
    * @readonly
-   * @type {Type[]}
+   * @type {Value[]}
    */
-  public get value(): Type[] {
+  public get value(): Value[] {
     return this.#data.value;
   }
 
   /**
-   * @description
-   * @type {Storage}
+   * @description The data type to store the value.
+   * @type {Type}
    */
-  #data: Storage;
+  #data: Type;
 
   /**
    * Creates an instance of `HistoryStorage` child class.
    * @constructor
-   * @param {Type[]} value The initial value.
-   * @param {new(value: Type[]) => Storage} [storage=Data as any] 
+   * @param {Value[]} value The initial value.
+   * @param {new(value: Value[]) => Type} [data=Data as any] 
    */
   constructor(
-    value: Type[],
-    storage: new(value: Type[]) => Storage = Data as any
+    value: Value[],
+    data: new (value: Value[]) => Type = Data as any
   ) {
     super();
-    this.#data = new storage(value);
+    this.#data = new data(value);
   }
 
   /**
-   * @description Destroys the `Value` object by setting it to `null`.
+   * @description Destroys the storage data by setting it to `null`.
    * @public
    * @returns {this} Returns the current instance.
    */
@@ -78,22 +88,22 @@ export abstract class HistoryStorage<
   }
 
   /**
-   * @description Sets the data value.
+   * @description Gets the readonly history.
    * @public
-   * @param {Type[]} value The data of `Type[]` to set.
-   * @returns {this} Returns `this` current instance.
+   * @returns {Readonly<Value[]>} 
    */
-  public set(value: Type[]) {
-    this.#data.set(value);
-    return this;
+  public get(): Readonly<Value[]> {
+    return this.#data.value;
   }
 
   /**
-   * @description Gets the readonly history.
+   * @description Sets the data value.
    * @public
-   * @returns {Readonly<Type[]>} 
+   * @param {Value[]} value The data of `Type[]` to set.
+   * @returns {this} Returns `this` current instance.
    */
-  public get(): Readonly<Type[]> {
-    return this.#data.value;
+  public set(value: Value[]) {
+    this.#data.set(value);
+    return this;
   }
 }
