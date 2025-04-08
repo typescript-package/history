@@ -5,7 +5,7 @@ import {
   DataCore
 } from '@typescript-package/data';
 // Abstract.
-import { HistoryAppend } from './history-append.abstract';
+import { HistoryAppend } from '../history-append.abstract';
 /**
  * @description Manages the undo history with append mechanism.
  * @export

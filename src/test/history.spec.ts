@@ -1,24 +1,24 @@
-import { History as AbstractHistory } from "../lib";
-import { WeakData } from '@typescript-package/data';
+import { History as BaseHistory } from "../lib";
+import { DataCore, WeakData } from '@typescript-package/data';
 
-let history = new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
+export let history = new class History<Type, Size extends number = number>
+  extends BaseHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
 
 describe(`History`, () => {
   beforeEach(() => {
-    history = new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
+    history = new class History<Type, Size extends number = number> extends BaseHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
   });
 
   it(`set()`, () => {
-    history.set(10);
-    history.set(15);
-    history.set(20);
+    history.set(10).set(15).set(20);
+    console.log(`history.undoHistory.data`, WeakData.get(history.undoHistory.data));
 
     expect(history.undoHistory.get()).toEqual([5, 10, 15]);
     expect(history.current).toEqual(20);
   });
 
   it(`initial`, () => {
-    expect(new class History<Type, Size extends number = number> extends AbstractHistory<Type, Size>{}().hasCurrent()).toBeFalse();
+    expect(new class History<Type, Size extends number = number> extends BaseHistory<Type, Size>{}().hasCurrent()).toBeFalse();
 
     expect(history.undoHistory.get()).toEqual([]);
     expect(history.current).toEqual(5);
@@ -95,3 +95,38 @@ describe(`History`, () => {
     console.groupEnd();
   });
 });
+
+
+export class CustomData<Type> extends DataCore<Type[]> {
+  #value: Type[];
+
+  public get value() {
+    return this.#value;
+  }
+
+  constructor(value: Type[]) {
+    super();
+    this.#value = value;
+  }
+
+  public destroy() {
+    return this;
+  }
+
+  public set(value: Type[]) {
+    this.#value = value;
+    localStorage.setItem('', JSON.stringify(value));
+    return this;
+  }
+}
+
+// Initialize.
+export const customHistory = new class History<Type, Size extends number = number>
+  extends BaseHistory<Type, Size, CustomData<Type>>{}({value: 'a', size: 5}, CustomData);
+
+// Add to the history.
+customHistory.set('b').set('c').set('d').set('e').set('f').undo().undo();
+
+// Check the stored redo and undo in `CustomData`.
+console.log(`customHistory.data.redo`, customHistory.data.redo.value); // Output: ['e', 'f']
+console.log(`customHistory.data.undo`, customHistory.data.undo.value); // Output: ['a', 'b', 'c']
