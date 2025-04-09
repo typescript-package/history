@@ -9,6 +9,11 @@ import { HistoryCore } from './history-core.abstract';
 /**
  * @description Class extends the `HistoryCore` class to maintain a history of values in a prepend manner.
  * This means that new entries are added to the beginning of the history, and older entries are shifted out as the history size exceeds its limit.
+ * LIFO(Last in, First out): The last value that was added (the most recent one) will be the first one to be removed.
+ * Add: Add to the beginning of the array (unshift).
+ * Take: Remove from the beginning of the array (shift), which is the most recent item.
+ * PeekFirst: Look at the first item in the history (newest).
+ * PeekLast: Look at the last item in the history (oldest).
  * @export
  * @abstract
  * @class HistoryPrepend
@@ -67,16 +72,25 @@ export abstract class HistoryPrepend<
   }
 
   /**
-   * @description Returns the last value that would be redone without modifying history.
+   * @description Returns the first value in the history, the newest value without modifying history.
+   * @public
+   * @returns {Value | undefined} The next redo value.
+   */
+  public peekFirst(): Value | undefined {
+    return super.history[0];
+  }
+
+  /**
+   * @description Returns the last value in the history, the oldest value without modifying history.
    * @public
    * @returns {Value | undefined} The next redo value.
    */
   public peekLast(): Value | undefined {
-    return super.history[super.history.length - 1];
+    return super.history.at(-1);
   }
 
   /**
-   * @description Returns the next value that would be redone without modifying history.
+   * @description Returns the next value in the history, the newest value without modifying history.
    * @public
    * @returns {Value | undefined} The next redo value.
    */
@@ -85,7 +99,7 @@ export abstract class HistoryPrepend<
   }
 
   /**
-   * @description Takes the first value.
+   * @description Removes and returns the first value in the history.
    * @public
    * @returns {(Value | undefined)} 
    */
