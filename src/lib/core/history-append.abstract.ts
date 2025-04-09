@@ -72,7 +72,7 @@ export abstract class HistoryAppend<
   }
 
   /**
-   * @description Returns the first(oldest) added value that would be used to redo or undo without modifying history.
+   * @description Returns the first (oldest) value in the history without modifying it.
    * @public
    * @returns {(Value | undefined)} The first value.
    */
@@ -81,7 +81,7 @@ export abstract class HistoryAppend<
   }
 
   /**
-   * @description Returns last(newest) entry in the history, last added that would be used in redo or undo without modifying history.
+   * @description Returns the most recent (last added) value in the history without modifying it.
    * @public
    * @returns {(Value | undefined)} The last added value.
    */
@@ -90,7 +90,7 @@ export abstract class HistoryAppend<
   }
 
   /**
-   * @description Returns next value to be used in redo or undo without modifying history.
+   * @description Returns the next value that would be removed (the most recent one) without modifying history.
    * - LIFO behavior
    * @public
    * @returns {(Value | undefined)} The next value in the append manner.
