@@ -3,7 +3,13 @@
  */
 export {
   History,
-  HistoryAppend,
-  HistoryCore,
-  HistoryPrepend,
+
+  // Base.
+  CurrentHistory, RedoHistory, UndoHistory,
+
+  // Peek.
+  HistoryPeek, RedoHistoryPeek, UndoHistoryPeek,
+
+  // Core (Abstract).
+  HistoryAppend, HistoryCore, HistoryPrepend, HistoryStorage  
 } from './lib';
