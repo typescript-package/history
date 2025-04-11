@@ -6,6 +6,8 @@ import {
 } from '@typescript-package/data';
 // Abstract.
 import { HistoryCore } from './history-core.abstract';
+// Type.
+import { DataConstructor } from '../type';
 /**
  * @description Class extends the `HistoryCore` class to maintain a history of values in a append manner.
  * This means that new entries are added to the end of the history, and as the history exceeds its size limit, entries from the beginning are removed.
@@ -49,11 +51,11 @@ export abstract class HistoryAppend<
    * Creates an instance of `HistoryAppend` child class.
    * @constructor
    * @param {Size} [size=HistoryAppend.size as Size] 
-   * @param {new (value: Value[]) => DataType} [data=Data as any] 
+   * @param {?DataConstructor<Value, DataType>} [data] 
    */
   constructor(
     size: Size = HistoryAppend.size as Size,
-    data: new (value: Value[]) => DataType = Data as any
+    data?: DataConstructor<Value, DataType>
   ) {
     super(size, data);
   }
@@ -65,9 +67,10 @@ export abstract class HistoryAppend<
    * @returns {this} The current instance.
    */
   public add(value: Value): this {
-    const history = super.history;
-    history.length >= super.size && history.shift();
-    super.size > 0 && history.push(value);
+    if (super.size > 0) {
+      super.history.push(value);
+      super.trim('shift');
+    }
     return this;
   }
 
@@ -76,7 +79,7 @@ export abstract class HistoryAppend<
    * @public
    * @returns {(Value | undefined)} The first value.
    */
-  public peekFirst(): Value | undefined {
+  public first(): Value | undefined {
     return super.history[0];
   }
 
@@ -85,7 +88,7 @@ export abstract class HistoryAppend<
    * @public
    * @returns {(Value | undefined)} The last added value.
    */
-  public peekLast(): Value | undefined {
+  public last(): Value | undefined {
     return super.history.at(-1);
   }
 
@@ -95,7 +98,7 @@ export abstract class HistoryAppend<
    * @public
    * @returns {(Value | undefined)} The next value in the append manner.
    */
-  public peekNext(): Value | undefined {
+  public next(): Value | undefined {
     return super.history.at(-1);
   }
 
