@@ -4,26 +4,28 @@ import {
   // Abstract.
   DataCore
 } from '@typescript-package/data';
+// Type.
+import { DataConstructor } from '../type';
 /**
  * @description The history storage of specified data.
  * @export
  * @abstract
  * @class HistoryStorage
  * @template Value 
- * @template {DataCore<Value[]>} [Type=Data<Value[]>] 
+ * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
  * @extends {DataCore<Value[]>}
  */
 export abstract class HistoryStorage<
   Value,
-  Type extends DataCore<Value[]> = Data<Value[]>
-> extends DataCore<Value[]> {
+  DataType extends DataCore<Value[]> = Data<Value[]>
+> {
   /**
    * @description Returns the `string` tag representation of the `HistoryStorage` class when used in `Object.prototype.toString.call(instance)`.
    * @public
    * @readonly
    * @type {string}
    */
-  public override get [Symbol.toStringTag](): string {
+  public get [Symbol.toStringTag](): string {
     return HistoryStorage.name;
   }
 
@@ -31,9 +33,9 @@ export abstract class HistoryStorage<
    * @description
    * @public
    * @readonly
-   * @type {Type}
+   * @type {DataType}
    */
-  public get data() {
+  public get data(): DataType {
     return this.#data;
   }
 
@@ -48,33 +50,22 @@ export abstract class HistoryStorage<
   }
 
   /**
-   * @description
-   * @public
-   * @readonly
-   * @type {Value[]}
-   */
-  public get value(): Value[] {
-    return this.#data.value;
-  }
-
-  /**
    * @description The data type to store the value.
-   * @type {Type}
+   * @type {DataType}
    */
-  #data: Type;
+  #data: DataType;
 
   /**
    * Creates an instance of `HistoryStorage` child class.
    * @constructor
-   * @param {Value[]} value The initial value.
-   * @param {new(value: Value[]) => Type} [data=Data as any] 
+   * @param {Value[]} value 
+   * @param {?DataConstructor<Value, DataType>} [data] 
    */
   constructor(
     value: Value[],
-    data: new (value: Value[]) => Type = Data as any
+    data?: DataConstructor<Value, DataType>
   ) {
-    super();
-    this.#data = new data(value);
+    this.#data = data ? new data(value) : new (Data as unknown as DataConstructor<Value, DataType>)(value);
   }
 
   /**
@@ -97,12 +88,21 @@ export abstract class HistoryStorage<
   }
 
   /**
-   * @description Sets the data value.
+   * @description Checks whether the storage is empty.
    * @public
+   * @returns {boolean} 
+   */
+  public isEmpty(): boolean {
+    return this.#data.value.length === 0;
+  }
+
+  /**
+   * @description Sets the data value.
+   * @protected
    * @param {Value[]} value The data of `Type[]` to set.
    * @returns {this} Returns `this` current instance.
    */
-  public set(value: Value[]) {
+  protected set(value: Value[]) {
     this.#data.set(value);
     return this;
   }
