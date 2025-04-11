@@ -6,6 +6,8 @@ import {
 } from '@typescript-package/data';
 // Abstract.
 import { HistoryCore } from './history-core.abstract';
+// Type.
+import { DataConstructor } from '../type';
 /**
  * @description Class extends the `HistoryCore` class to maintain a history of values in a prepend manner.
  * This means that new entries are added to the beginning of the history, and older entries are shifted out as the history size exceeds its limit.
@@ -49,11 +51,11 @@ export abstract class HistoryPrepend<
    * Creates an instance of `HistoryPrepend` child class.
    * @constructor
    * @param {Size} [size=HistoryPrepend.size as Size] 
-   * @param {new (value: Value[]) => DataType} [data=Data as any] 
+   * @param {?DataConstructor<Value, DataType>} [data] 
    */
   constructor(
     size: Size = HistoryPrepend.size as Size,
-    data: new (value: Value[]) => DataType = Data as any
+    data?: DataConstructor<Value, DataType>
   ) {
     super(size, data);
   }
@@ -65,9 +67,10 @@ export abstract class HistoryPrepend<
    * @returns {this} The current instance.
    */
   public add(value: Value): this {
-    const history = super.history;
-    history.length >= super.size && history.pop();
-    super.size > 0 && history.unshift(value);
+    if (super.size > 0) {
+      super.history.unshift(value);
+      super.trim('pop');
+    }
     return this;
   }
 
@@ -76,7 +79,7 @@ export abstract class HistoryPrepend<
    * @public
    * @returns {Value | undefined} The next redo value.
    */
-  public peekFirst(): Value | undefined {
+  public first(): Value | undefined {
     return super.history[0];
   }
 
@@ -85,7 +88,7 @@ export abstract class HistoryPrepend<
    * @public
    * @returns {Value | undefined} The next redo value.
    */
-  public peekLast(): Value | undefined {
+  public last(): Value | undefined {
     return super.history.at(-1);
   }
 
@@ -94,7 +97,7 @@ export abstract class HistoryPrepend<
    * @public
    * @returns {Value | undefined} The next redo value.
    */
-  public peekNext(): Value | undefined {
+  public next(): Value | undefined {
     return super.history[0];
   }
 
