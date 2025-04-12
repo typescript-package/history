@@ -9,7 +9,7 @@ import { CurrentHistory, RedoHistory, UndoHistory } from '.';
 // Type.
 import { HistoryCurrentConstructor, DataConstructor, HistoryCoreConstructor } from '../type';
 /**
- * @description
+ * @description The base abstract class to manage history.
  * @export
  * @abstract
  * @class HistoryBase
@@ -85,18 +85,18 @@ export abstract class HistoryBase<
   /**
    * @description Returns the redo history.
    * @public
-   * @readonly
-   * @type {RedoHistory<any, number>}
+   * @readonly    
+   * @type {HistoryCore<Value, Size, DataType>}
    */
   public get redoHistory() {
     return this.#redo;
   }
-
+  
   /**
    * @description Returns the undo history.
    * @public
    * @readonly
-   * @type {UndoHistory<any, number>}
+   * @type {HistoryCore<Value, Size, DataType>}
    */
   public get undoHistory() {
     return this.#undo;
@@ -132,6 +132,22 @@ export abstract class HistoryBase<
    */
   #undo
 
+  /**
+   * Creates an instance of `HistoryBase` child class.
+   * @constructor
+   * @param {{ value?: Value, size?: Size}} [param0={}] 
+   * @param {Value} param0.value 
+   * @param {Size} param0.size 
+   * @param {?DataConstructor<Value, DataType>} [data] 
+   * @param {{
+   *       current?: HistoryCurrentConstructor<Value, DataType>,
+   *       redo?: HistoryCoreConstructor<Value, Size, DataType>,
+   *       undo?: HistoryCoreConstructor<Value, Size, DataType>,
+   *     }} [param1={}] 
+   * @param {HistoryCurrentConstructor<Value, DataType>} param1.current 
+   * @param {HistoryCoreConstructor<Value, Size, DataType>} param1.redo 
+   * @param {HistoryCoreConstructor<Value, Size, DataType>} param1.undo 
+   */
   constructor(
     {value, size}: { value?: Value, size?: Size} = {},
     data?: DataConstructor<Value, DataType>,
@@ -166,8 +182,8 @@ export abstract class HistoryBase<
   public destroy(): this {
     this.clear();
     this.#current.destroy();
-    this.#undo.destroy();
     this.#redo.destroy();
+    this.#undo.destroy();
     return this;
   }
 
@@ -329,13 +345,22 @@ export abstract class HistoryBase<
   //#endregion
 
   /**
-   * @description Pick the undo or redo history.
+   * @description Pick the current, redo or undo history.
    * @public
-   * @param {('undo' | 'redo')} type 
+   * @param {('current' | 'redo' | 'undo')} type 
    * @returns {Readonly<Value[]>} 
    */
-  public pick(type: 'undo' | 'redo'): Readonly<Value[]> {
-    return (type === 'undo' ? this.#undo : this.#redo).get();
+  public pick(type: 'current' | 'redo' | 'undo'): Readonly<Value[]> {
+    switch(type) {
+      case 'current':
+        return this.#current.get();
+      case 'redo':
+        return this.#redo.get();
+      case 'undo':
+        return this.#undo.get();
+      default:
+        throw new Error(`Invalid type: ${type}. Expected 'current', 'redo', or 'undo'.`);
+    }
   }
 
   /**
