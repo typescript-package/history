@@ -5,11 +5,12 @@ export {
   History,
 
   // Base.
-  CurrentHistory, RedoHistory, UndoHistory,
-
-  // Peek.
-  HistoryPeek, RedoHistoryPeek, UndoHistoryPeek,
+  HistoryBase,
 
   // Core (Abstract).
-  HistoryAppend, HistoryCore, HistoryPrepend, HistoryStorage  
+  HistoryAppend,
+  HistoryCore,
+  HistoryCurrent,
+  HistoryPrepend,
+  HistoryStorage  
 } from './lib';

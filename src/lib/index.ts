@@ -1,6 +1,5 @@
 export { History } from './history.class';
-export { HistoryAppend } from './history-append.abstract';
-export { HistoryCore } from './history-core.abstract';
-export { HistoryStorage } from './history-storage.abstract';
-export { HistoryPeek, RedoHistoryPeek, UndoHistoryPeek } from './peek';
-export { HistoryPrepend } from './history-prepend.abstract';
+// Base.
+export { HistoryBase } from './base';
+// Core.
+export { HistoryAppend, HistoryCore, HistoryCurrent, HistoryPrepend, HistoryStorage } from './core';
