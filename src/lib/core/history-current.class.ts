@@ -5,7 +5,13 @@ import { HistoryStorage } from '.';
 // Type.
 import { DataConstructor } from '../type';
 /**
- * @description
+ * @description The class represents the current value of the history.
+ * The class is used to:
+ * - store the current value of the history,
+ * - check whether the current value is set,
+ * - update the current value of the history,
+ * - clear the current value of the history,
+ * - get the current value of the history.
  * @export
  * @abstract
  * @class HistoryCurrent
