@@ -6,21 +6,23 @@ import {
 } from '@typescript-package/data';
 // Abstract.
 import { HistoryStorage } from './history-storage.abstract';
+// Type.
+import { DataConstructor } from '../type';
 /**
  * @description The core class for history append and prepend.
  * @export
  * @abstract
  * @class HistoryCore
- * @template Type 
+ * @template Value 
  * @template {number} [Size=number] 
- * @template {DataCore<Type[]>} [DataType=Data<Type[]>] 
- * @extends {HistoryStorage<Type, DataType>}
+ * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
+ * @extends {HistoryStorage<Value, DataType>}
  */
 export abstract class HistoryCore<
-  Type,
+  Value,
   Size extends number = number,
-  DataType extends DataCore<Type[]> = Data<Type[]>
-> extends HistoryStorage<Type, DataType> {
+  DataType extends DataCore<Value[]> = Data<Value[]>
+> extends HistoryStorage<Value, DataType> {
   /**
    * @description Returns the `string` tag representation of the `HistoryCore` class when used in `Object.prototype.toString.call(instance)`.
    * @public
@@ -30,15 +32,15 @@ export abstract class HistoryCore<
   public override get [Symbol.toStringTag](): string {
     return HistoryCore.name;
   }
-  
+
   /**
    * @description Gets the history.
    * @protected
    * @readonly
-   * @type {Type[]}
+   * @type {Value[]}
    */
-  protected get history(): Type[] {
-    return super.value;
+  protected get history(): Value[] {
+    return super.data.value;
   }
 
   /**
@@ -61,10 +63,11 @@ export abstract class HistoryCore<
    * Creates an instance of `HistoryCore` child class.
    * @constructor
    * @param {Size} size 
+   * @param {?DataConstructor<Value, DataType>} [data] 
    */
   constructor(
     size: Size,
-    data: new (value: Type[]) => DataType
+    data?: DataConstructor<Value, DataType>
   ) {
     super([], data);
     this.#size = size;
@@ -73,10 +76,20 @@ export abstract class HistoryCore<
   /**
    * @description Adds the value to the history.
    * @public
-   * @param {Type} value The value to store.
+   * @param {Value} value The value to store.
    * @returns {this} The current instance.
    */
-  public abstract add(value: Type): this;
+  public abstract add(value: Value): this;
+
+  /**
+   * @description Returns the value at the specified index in the history.
+   * @public
+   * @param {number} index The position in the history (0-based index).
+   * @returns {Value | undefined} The value at the specified position.
+   */
+  public at(index: number): Value | undefined {
+    return this.history[index];
+  }
 
   /**
    * @description Clears the history.
@@ -90,36 +103,38 @@ export abstract class HistoryCore<
   }
 
   /**
-   * @description Returns the value at the specified index in the history.
+   * @description Returns the first value without modifying history.
    * @public
-   * @param {number} index The position in the history (0-based index).
-   * @returns {Type | undefined} The value at the specified position.
+   * @abstract
+   * @returns {(Value | undefined)} 
    */
-  public peek(index: number): Type | undefined {
-    return this.history[index];
+  public first(): Value | undefined {
+    return this.history[0];
   }
 
   /**
-   * @description Returns the next value that would be undone without modifying history.
+   * @description Returns the last value without modifying history.
    * @public
    * @abstract
-   * @returns {(Type | undefined)} 
+   * @returns {(Value | undefined)} 
    */
-  public abstract peekLast(): Type | undefined;
+  public last(): Value | undefined {
+    return this.history.at(-1);
+  }
 
   /**
-   * @description Returns the next value that would be redone without modifying history.
+   * @description Returns the next value without modifying history.
    * @public
    * @abstract
-   * @returns {(Type | undefined)} 
+   * @returns {(Value | undefined)} 
    */
-  public abstract peekNext(): Type | undefined;
+  public abstract next(): Value | undefined;
 
   /**
    * @description Sets the size for history.
    * @public
    * @param {Size} size 
-   * @returns {this} 
+   * @returns {this} The `this` current instance.
    */
   public setSize(size: Size): this {
     this.#size = size;
@@ -130,7 +145,22 @@ export abstract class HistoryCore<
    * @description Takes the first value.
    * @public
    * @abstract
-   * @returns {(Type | undefined)} 
+   * @returns {(Value | undefined)} 
    */
-  public abstract take(): Type | undefined;
+  public abstract take(): Value | undefined;
+
+  /**
+   * @description The method to trim the history.
+   * @protected
+   * @param {('pop' | 'shift')} method The method `pop` or `shift` to trim the history.
+   * @returns {this} 
+   */
+  protected trim(method: 'pop' | 'shift'): this {
+    if (this.#size > 0) {
+      while (this.history.length > this.size) {
+        method === 'pop' ? this.history.pop() : method === 'shift' && this.history.shift();
+      }  
+    }
+    return this;
+  }
 }
