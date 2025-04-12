@@ -1,10 +1,21 @@
+// Data.
 import { Data, DataCore } from '@typescript-package/data';
-import { HistoryStorage } from '../core';
-
+// Abstract.
+import { HistoryCurrent } from '../core';
+// Type.
+import { DataConstructor } from '../type';
+/**
+ * @description 
+ * @export
+ * @class CurrentHistory
+ * @template Value 
+ * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
+ * @extends {HistoryStorage<Value, DataType>}
+ */
 export class CurrentHistory<
   Value,
   DataType extends DataCore<Value[]> = Data<Value[]>
-> extends HistoryStorage<Value, DataType> {
+> extends HistoryCurrent<Value, DataType> {
   /**
    * @description Returns the `string` tag representation of the `CurrentHistory` class when used in `Object.prototype.toString.call(instance)`.
    * @public
@@ -15,30 +26,37 @@ export class CurrentHistory<
     return CurrentHistory.name;
   }
 
-  constructor(
-    {value}: {value?: Value} = {},
-    data: new (value: Value[]) => DataType = Data as any
-  ) {
-    super(Object.hasOwn(arguments[0] || {}, 'value') ? [value] as Value[] : [], data);
+  /**
+   * @description
+   * @public
+   * @readonly
+   * @type {Value}
+   */
+  public get value(): Value {
+    return Array.isArray(super.data.value) ? super.data.value[0] : undefined as Value;
   }
 
   /**
-   * @description Clears the `undo` and `redo` history, removes the current value, and resets the `hasSetBeenCalled`.
-   * @public
-   * @returns {this} The current instance.
+   * Creates an instance of `CurrentHistory`.
+   * @constructor
+   * @param {{value?: Value}} [param0={}] 
+   * @param {Value} param0.value 
+   * @param {?DataConstructor<Value, DataType>} [data] 
    */
-  public clear(): this {
-    super.set([]);
-    return this;
+  constructor(
+    {value}: {value?: Value} = {},
+    data?: DataConstructor<Value, DataType>
+  ) {
+    super(arguments[0], data);
   }
 
-  /**s
+  /**
    * @description Destroys the history of this instance.
    * @public
    * @returns {this} The current instance.
    */
   public override destroy(): this {
-    this.clear();
+    super.clear();
     super.destroy();
     return this;
   }
@@ -49,11 +67,8 @@ export class CurrentHistory<
    * @returns {boolean} 
    */
   public has() {
-    return super.data.value ? super.data.value.length > 0 : false;
+    return Array.isArray(super.data.value) && super.data.value.length > 0;
   }
-
-
-  public onSet(value: Value): this { return this; };
 
   /**
    * @description Updates a current value.
