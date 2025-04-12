@@ -75,12 +75,21 @@ export abstract class HistoryPrepend<
   }
 
   /**
-   * @description Returns the first value in the history, the newest value without modifying history.
+   * @description Returns the next(index 0) value in the history, the newest value without modifying history.
    * @public
    * @returns {Value | undefined} The next redo value.
    */
-  public first(): Value | undefined {
-    return super.history[0];
+  public next(): Value | undefined {
+    return this.first();
+  }
+
+  /**
+   * @description Returns the most recent(first index 0) value in the history without modifying it. 
+   * @public
+   * @returns {(Value | undefined)} 
+   */
+  public newest(): Value | undefined {
+    return this.first();
   }
 
   /**
@@ -88,17 +97,8 @@ export abstract class HistoryPrepend<
    * @public
    * @returns {Value | undefined} The next redo value.
    */
-  public last(): Value | undefined {
-    return super.history.at(-1);
-  }
-
-  /**
-   * @description Returns the next value in the history, the newest value without modifying history.
-   * @public
-   * @returns {Value | undefined} The next redo value.
-   */
-  public next(): Value | undefined {
-    return super.history[0];
+  public oldest(): Value | undefined {
+    return this.last();
   }
 
   /**

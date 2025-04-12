@@ -62,6 +62,7 @@ export abstract class HistoryAppend<
 
   /**
    * @description Adds the value to the history.
+   * - FIFO unshift/queue style
    * @public
    * @param {Value} value The value to store.
    * @returns {this} The current instance.
@@ -75,21 +76,12 @@ export abstract class HistoryAppend<
   }
 
   /**
-   * @description Returns the first (oldest) value in the history without modifying it.
+   * @description Returns the most recent (last index added) value in the history without modifying it. 
    * @public
-   * @returns {(Value | undefined)} The first value.
+   * @returns {(Value | undefined)} 
    */
-  public first(): Value | undefined {
-    return super.history[0];
-  }
-
-  /**
-   * @description Returns the most recent (last added) value in the history without modifying it.
-   * @public
-   * @returns {(Value | undefined)} The last added value.
-   */
-  public last(): Value | undefined {
-    return super.history.at(-1);
+  public newest(): Value | undefined {
+    return this.last();
   }
 
   /**
@@ -99,7 +91,16 @@ export abstract class HistoryAppend<
    * @returns {(Value | undefined)} The next value in the append manner.
    */
   public next(): Value | undefined {
-    return super.history.at(-1);
+    return super.last();
+  }
+
+  /**
+   * @description Returns the first(index 0 the oldest) value in the history without modifying it.
+   * @public
+   * @returns {(Value | undefined)} 
+   */
+  public oldest(): Value | undefined {
+    return super.first();
   }
 
   /**
