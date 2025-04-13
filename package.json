@@ -1,15 +1,16 @@
 {
   "name": "@typescript-package/history",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "wwwdev.io <dev@wwwdev.io>",
-  "description": "A TypeScript package for tracking the history of values.",
+  "description": "A lightweight TypeScript package for tracking the history of values.",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "devDependencies": {},
-  "peerDependencies": {},
+  "peerDependencies": {
+    "@typescript-package/data": "^2.0.0"
+  },
   "scripts": {
     "prepublishOnly": "npm run pkg && npm run clean",
     "pkg": "npm pkg delete dependencies",
