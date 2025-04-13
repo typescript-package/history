@@ -248,6 +248,10 @@ export class CustomData<Type> extends DataCore<Type[]> {
     this.#value = value;
   }
 
+  public clear() {
+    return this;
+  }
+
   public destroy() {
     return this;
   }
