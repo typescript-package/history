@@ -13,16 +13,21 @@
 [![GitHub issues][typescript-package-badge-issues]][typescript-package-issues]
 [![GitHub license][typescript-package-badge-license]][typescript-package-license]
 
-A **TypeScript** package for tracking history of values.
+A **lightweight TypeScript** package for tracking history of values.
 
 ## Table of contents
 
 - [Installation](#installation)
 - [Api](#api)
   - [`History`](#history)
-  - [`HistoryAppend`](#historyappend)
-  - [`HistoryCore`](#historycore)
-  - [`HistoryPrepend`](#historyprepend)
+  - Base
+    - [`HistoryBase`](#historybase)
+  - Core
+    - [`HistoryAppend`](#historyappend)
+    - [`HistoryCore`](#historycore)
+    - [`HistoryCurrent`](#historycurrent)
+    - [`HistoryPrepend`](#historyprepend)
+    - [`HistoryStorage`](#historystorage)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Code of Conduct](#code-of-conduct)
@@ -33,8 +38,16 @@ A **TypeScript** package for tracking history of values.
 
 ## Installation
 
+### 1. Install peer dependencies
+
 ```bash
-npm install @typescript-package/history
+npm install @typescript-package/data --save-peer
+```
+
+### 2. Install package
+
+```bash
+npm install @typescript-package/history --save-peer
 ```
 
 ## Api
@@ -42,20 +55,29 @@ npm install @typescript-package/history
 ```typescript
 import {
   History,
+
+  // Base.
+  HistoryBase,
+
+  // Core (Abstract).
   HistoryAppend,
   HistoryCore,
+  HistoryCurrent,
   HistoryPrepend,
+  HistoryStorage  
 } from '@typescript-package/history';
 ```
 
 ## `History`
 
+The class to manage the value changes.
+
 ```typescript
-import { History } from '@typescript-package/history';
+import { History as BaseHistory } from '@typescript-package/history';
 
 // Initialize.
-const history = new class History<Type, Size extends number = number>
-  extends AbstractHistory<Type, Size>{}({value: 5, size: 5});
+export const history = new History<Type, Size extends number = number>
+  extends BaseHistory<Type, Size>{}({value: 5, size: 5});
 
 console.group(`History README.md`);
 
@@ -103,11 +125,34 @@ console.log(history.undoHistory.get(), history.current, history.redoHistory.get(
 console.groupEnd();
 ```
 
+An example of usage data type.
+
+```typescript
+import { History as BaseHistory } from '@typescript-package/history';
+import { WeakData } from '@typescript-package/data';
+
+// Initialize.
+export const history = new class History<Type, Size extends number = number>
+  extends BaseHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
+
+// Add to the history.
+history.set(10).set(15).set(20);
+
+// Check whether it is stored under the `WeakData`.
+console.log(`history.undoHistory.data`, WeakData.get(history.undoHistory.data)); // Output: [5, 10, 15]
+
+```
+
+## `HistoryBase`
+
+The base `abstract` class to manage history.
+
 ## `HistoryAppend`
 
 ```typescript
 import { HistoryAppend as AbstractHistoryAppend } from '@typescript-package/history';
 
+// Initialize.
 export const historyAppend = new class HistoryAppend<Type = number, Size extends number = number>
   extends AbstractHistoryAppend<Type, Size>{}();
 
@@ -129,11 +174,60 @@ console.log(historyAppend.get()); // Outputs: [127]
 
 The core class for history append and prepend.
 
+## `HistoryCurrent`
+
+The class represents the current value of the history.
+
+```typescript
+import { HistoryCurrent as AbstractHistoryCurrent } from '@typescript-package/history';
+
+export class HistoryCurrent<
+  Value,
+  DataType extends DataCore<Value[]> = Data<Value[]>
+> extends AbstractHistoryCurrent<Value, DataType> {
+  public override get value() {
+    return super.data.value[0]
+  }
+  public has() {
+    return super.data.value.length > 0;
+  }
+  public override set(value: Value[]) {
+    super.set(value);
+    return this;
+  }
+  public update(value: Value) {
+    super.set([value]);
+    return this;
+  }
+}
+
+const historyCurrent = new HistoryCurrent({value: 'a'});
+console.log(`get()`, historyCurrent.get()); // ['a']
+console.log(`length`, historyCurrent.length); // 1
+console.log(`isEmpty()`, historyCurrent.isEmpty()); // false
+console.log(`data.value`, historyCurrent.data.value); // ['a']
+historyCurrent.set(['b']);
+console.log(`get()`, historyCurrent.get()); // ['b']
+console.log(`length`, historyCurrent.length); // 1
+console.log(`isEmpty()`, historyCurrent.isEmpty()); // false
+historyCurrent.set(['b', 'c', 'd']);
+console.log(`get()`, historyCurrent.get()); // ['b', 'c', 'd']
+console.log(`length`, historyCurrent.length); // 3
+console.log(`isEmpty()`, historyCurrent.isEmpty()); // false
+historyCurrent.update('e');
+console.log(`get()`, historyCurrent.get()); // ['e']
+console.log(`length`, historyCurrent.length); // 1
+console.log(`isEmpty()`, historyCurrent.isEmpty()); // false
+historyCurrent.destroy();
+
+```
+
 ## `HistoryPrepend`
 
 ```typescript
 import { HistoryPrepend as AbstractHistoryPrepend } from '@typescript-package/history';
 
+// Initialize.
 export const historyPrepend = new class HistoryPrepend<Type = number, Size extends number = number>
   extends AbstractHistoryPrepend<Type, Size>{}();
 
@@ -149,6 +243,38 @@ console.log(`peekNext()`, historyPrepend.peekNext()); // Outputs: 227
 // Take from the history.
 console.log(historyPrepend.take()); // 227
 console.log(historyPrepend.get()); // [327, 127]
+```
+
+## `HistoryStorage`
+
+The history storage of specified data.
+
+```typescript
+import { HistoryStorage as AbstractHistoryStorage } from '@typescript-package/history';
+
+export class HistoryStorage<
+  Value,
+  DataType extends DataCore<Value[]> = Data<Value[]>
+> extends AbstractHistoryStorage<Value, DataType> {
+  public override set(value: Value[]) {
+    super.set(value);
+    return this;
+  }
+}
+
+const historyStorage = new HistoryStorage(['a']);
+console.log(historyStorage.get()); // ['a']
+console.log(historyStorage.length); // 1
+console.log(historyStorage.isEmpty()); // false
+console.log(historyStorage.data.value); // ['a']
+historyStorage.set(['b']);
+console.log(historyStorage.get()); // ['b']
+historyStorage.set(['b', 'c', 'd']);
+console.log(historyStorage.get()); // ['b', 'c', 'd']
+console.log(historyStorage.length); // 3
+historyStorage.destroy();
+console.log(Object.hasOwn(historyStorage.data, 'value')); // false
+
 ```
 
 ## Contributing
@@ -206,13 +332,20 @@ MIT © typescript-package ([license][typescript-package-license])
 ## Packages
 
 - **[@typescript-package/affix](https://github.com/typescript-package/affix)**: A **lightweight TypeScript** library for the affix - prefix and suffix.
+- **[@typescript-package/are](https://github.com/typescript-package/are)**: Type-safe `are` checkers for validating value types in TypeScript.
+- **[@typescript-package/data](https://github.com/typescript-package/data)**: A **lightweight TypeScript** library for basic data management.
 - **[@typescript-package/descriptor](https://github.com/typescript-package/descriptor)**: A **lightweight TypeScript** library for property descriptor.
+- **[@typescript-package/guard](https://github.com/typescript-package/guard)**: Type-safe guards for guarding the value types in TypeScript.c
+- **[@typescript-package/history](https://github.com/typescript-package/history)**: A **TypeScript** package for tracking history of values.
+- **[@typescript-package/is](https://github.com/typescript-package/is)**: Type-safe is checkers for validating value types in TypeScript.
 - **[@typescript-package/name](https://github.com/typescript-package/name)**: A **lightweight TypeScript** library for the name with prefix and suffix.
-- **[@typescript-package/queue](https://github.com/typescript-package/queue)**: A **lightweight TypeScript** library for managing various queue and stack structures.
 - **[@typescript-package/property](https://github.com/typescript-package/property)**: A **lightweight TypeScript** package with features to handle object properties.
+- **[@typescript-package/queue](https://github.com/typescript-package/queue)**: A **lightweight TypeScript** library for managing various queue and stack structures.
 - **[@typescript-package/range](https://github.com/typescript-package/range)**: A **lightweight TypeScript** library for managing various types of ranges.
 - **[@typescript-package/regexp](https://github.com/typescript-package/regexp)**: A **lightweight TypeScript** library for **RegExp**.
 - **[@typescript-package/state](https://github.com/typescript-package/state)**: Simple state management for different types in **TypeScript**.
+- **[@typescript-package/type](https://github.com/typescript-package/type)**: Utility types to enhance and simplify **TypeScript** development.
+- **[@typescript-package/wrapper](https://github.com/typescript-package/wrapper)**: A **lightweight TypeScript** library to wrap the text with the opening and closing chars.
 
 <!-- This package: typescript-package  -->
   <!-- GitHub: badges -->
