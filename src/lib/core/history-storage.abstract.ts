@@ -12,12 +12,11 @@ import { DataConstructor } from '../type';
  * @abstract
  * @class HistoryStorage
  * @template Value 
- * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
- * @extends {DataCore<Value[]>}
+ * @template {DataCore<readonly Value[]>} [DataType=Data<readonly Value[]>] 
  */
 export abstract class HistoryStorage<
   Value,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > {
   /**
    * @description Returns the `string` tag representation of the `HistoryStorage` class when used in `Object.prototype.toString.call(instance)`.
@@ -58,11 +57,11 @@ export abstract class HistoryStorage<
   /**
    * Creates an instance of `HistoryStorage` child class.
    * @constructor
-   * @param {Value[]} value 
+   * @param {readonly Value[]} value 
    * @param {?DataConstructor<Value, DataType>} [data] 
    */
   constructor(
-    value: Value[],
+    value: readonly Value[],
     data?: DataConstructor<Value, DataType>
   ) {
     this.#data = data ? new data(value) : new (Data as unknown as DataConstructor<Value, DataType>)(value);
@@ -81,9 +80,9 @@ export abstract class HistoryStorage<
   /**
    * @description Gets the readonly history.
    * @public
-   * @returns {Readonly<Value[]>} 
+   * @returns {readonly Value[]} 
    */
-  public get(): Readonly<Value[]> {
+  public get(): readonly Value[] {
     return this.#data.value;
   }
 
@@ -99,10 +98,10 @@ export abstract class HistoryStorage<
   /**
    * @description Sets the data value.
    * @protected
-   * @param {Value[]} value The data of `Type[]` to set.
+   * @param {readonly Value[]} value The data of `readonly Value[]` to set.
    * @returns {this} Returns `this` current instance.
    */
-  protected set(value: Value[]) {
+  protected set(value: readonly Value[]) {
     this.#data.set(value);
     return this;
   }
