@@ -1,9 +1,7 @@
 // Data.
-import { Data, DataCore } from '@typescript-package/data';
+import { Data, DataCore, DataConstructorInput } from '@typescript-package/data';
 // Abstract.
-import { HistoryStorage } from '.';
-// Type.
-import { DataConstructor } from '../type';
+import { HistoryStorage } from './history-storage.abstract';
 /**
  * @description The class represents the current value of the history.
  * The class is used to:
@@ -16,12 +14,12 @@ import { DataConstructor } from '../type';
  * @abstract
  * @class HistoryCurrent
  * @template Value 
- * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
+ * @template {DataCore<readonly Value[]>} [DataType=Data<readonly Value[]>] 
  * @extends {HistoryStorage<Value, DataType>}
  */
 export abstract class HistoryCurrent<
   Value,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > extends HistoryStorage<Value, DataType> {
   /**
    * @description Returns the `string` tag representation of the `HistoryCurrent` class when used in `Object.prototype.toString.call(instance)`.
@@ -47,11 +45,11 @@ export abstract class HistoryCurrent<
    * @constructor
    * @param {{value?: Value}} [param0={}] 
    * @param {Value} param0.value 
-   * @param {?DataConstructor<Value, DataType>} [data] 
+   * @param {?DataConstructor<readonly Value[], DataType>} [data] 
    */
   constructor(
     {value}: {value?: Value} = {},
-    data?: DataConstructor<Value, DataType>
+    data?: DataConstructorInput<readonly Value[], DataType>
   ) {
     super(Object.hasOwn(arguments[0] || {}, 'value') ? [value] as [Value] : [], data);
   }
