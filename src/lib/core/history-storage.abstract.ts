@@ -2,10 +2,10 @@ import {
   // Class.
   Data,
   // Abstract.
-  DataCore
+  DataCore,
+  // Type.
+  DataConstructorInput,
 } from '@typescript-package/data';
-// Type.
-import { DataConstructor } from '../type';
 /**
  * @description The history storage of specified data.
  * @export
@@ -29,7 +29,7 @@ export abstract class HistoryStorage<
   }
 
   /**
-   * @description
+   * @description Returns the data holder of `DataType`.
    * @public
    * @readonly
    * @type {DataType}
@@ -57,20 +57,20 @@ export abstract class HistoryStorage<
   /**
    * Creates an instance of `HistoryStorage` child class.
    * @constructor
-   * @param {readonly Value[]} value 
-   * @param {?DataConstructor<Value, DataType>} [data] 
-   */
+   * @param {readonly Value[]} value The initial array.
+   * @param {?DataConstructorInput<readonly Value[], DataType>} [data] Custom data holder, optionally with params.
+   */ 
   constructor(
     value: readonly Value[],
-    data?: DataConstructor<Value, DataType>
+    data?: DataConstructorInput<readonly Value[], DataType>
   ) {
-    this.#data = data ? new data(value) : new (Data as unknown as DataConstructor<Value, DataType>)(value);
+    this.#data = new (Array.isArray(data) ? data[0] : data ?? Data)(value, ...Array.isArray(data) ? data.slice(1) : []) as DataType;
   }
 
   /**
-   * @description Destroys the storage data by setting it to `null`.
+   * @description Destroys the storage data, by default setting it to `null`.
    * @public
-   * @returns {this} Returns the current instance.
+   * @returns {this} The `this` current instance.
    */
   public destroy(): this {
     this.#data.destroy();
@@ -98,10 +98,10 @@ export abstract class HistoryStorage<
   /**
    * @description Sets the data value.
    * @protected
-   * @param {readonly Value[]} value The data of `readonly Value[]` to set.
-   * @returns {this} Returns `this` current instance.
+   * @param {readonly Value[]} value The data value of `Value[]` to set.
+   * @returns {this} The `this` current instance.
    */
-  protected set(value: readonly Value[]) {
+  protected set(value: readonly Value[]): this {
     this.#data.set(value);
     return this;
   }
