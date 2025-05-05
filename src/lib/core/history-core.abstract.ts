@@ -2,12 +2,12 @@ import {
 // Class.
   Data,
   // Abstract.
-  DataCore
+  DataCore,
+  // Type.
+  DataConstructorInput,
 } from '@typescript-package/data';
 // Abstract.
 import { HistoryStorage } from './history-storage.abstract';
-// Type.
-import { DataConstructor } from '../type';
 /**
  * @description The core class for history append and prepend.
  * @export
@@ -15,13 +15,13 @@ import { DataConstructor } from '../type';
  * @class HistoryCore
  * @template Value 
  * @template {number} [Size=number] 
- * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
+ * @template {DataCore<readonly Value[]>} [DataType=Data<readonly Value[]>] 
  * @extends {HistoryStorage<Value, DataType>}
  */
 export abstract class HistoryCore<
   Value,
   Size extends number = number,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > extends HistoryStorage<Value, DataType> {
   /**
    * @description Returns the `string` tag representation of the `HistoryCore` class when used in `Object.prototype.toString.call(instance)`.
@@ -37,9 +37,9 @@ export abstract class HistoryCore<
    * @description Gets the history.
    * @protected
    * @readonly
-   * @type {Value[]}
+   * @type {readonly Value[]}
    */
-  protected get history(): Value[] {
+  protected get history(): readonly Value[] {
     return super.data.value;
   }
 
@@ -55,29 +55,30 @@ export abstract class HistoryCore<
 
   /**
    * @description The maximum size of the history.
-   * @type {number}
+   * @type {Size}
    */
-  #size
+  #size: Size;
 
   /**
    * Creates an instance of `HistoryCore` child class.
    * @constructor
-   * @param {Size} size 
-   * @param {?DataConstructor<Value, DataType>} [data] 
+   * @param {Size} size The maximum undo history size.
+   * @param {?DataConstructorInput<readonly Value[], DataType>} [data] Custom data holder.
    */
   constructor(
     size: Size,
-    data?: DataConstructor<Value, DataType>
+    data?: DataConstructorInput<readonly Value[], DataType>
   ) {
     super([], data);
     this.#size = size;
   }
 
+  //#region public method
   /**
    * @description Adds the value to the history.
    * @public
    * @param {Value} value The value to store.
-   * @returns {this} The current instance.
+   * @returns {this} The `this` current instance.
    */
   public abstract add(value: Value): this;
 
@@ -94,11 +95,10 @@ export abstract class HistoryCore<
   /**
    * @description Clears the history.
    * @public
-   * @returns {this} The current instance.
+   * @returns {this} The `this` current instance.
    */
   public clear(): this {
-    const history = this.history;
-    history.length = 0;
+    super.set([] as readonly Value[]);
     return this;
   }
 
@@ -133,7 +133,7 @@ export abstract class HistoryCore<
   /**
    * @description Sets the size for history.
    * @public
-   * @param {Size} size 
+   * @param {Size} size The maximum size of `Size`.
    * @returns {this} The `this` current instance.
    */
   public setSize(size: Size): this {
@@ -148,19 +148,76 @@ export abstract class HistoryCore<
    * @returns {(Value | undefined)} 
    */
   public abstract take(): Value | undefined;
+  //#endregion
+
+  //#region protected method
+  /**
+   * @description "Removes the last element from an array and returns it. If the array is empty, undefined is returned and the array is not modified."
+   * @protected
+   * @returns {this} The `this` current instance.
+   */
+  protected pop(): Value | undefined {
+    const history = [...this.history];
+    if (Array.isArray(history) && history.length > 0) {
+      const last = history.pop();
+      this.set(history);
+      return last;
+    }
+    return undefined;
+  }
+
+  /**
+   * @description "Appends new elements to the end of an array, and returns the new length of the array."
+   * @protected
+   * @param {...readonly Value[]} items  The items to append.
+   * @returns {number} The new length.
+   */
+  protected push(...items: readonly Value[]): number {
+    const history = [...this.history];
+    const length = history.push(...items);
+    return (this.set(history), length);
+  }
+
+  /**
+   * @description "Removes the first element from an array and returns it. If the array is empty, undefined is returned and the array is not modified."
+   * @protected
+   * @returns {this} The `this` current instance.
+   */
+  protected shift(): Value | undefined {
+    const history = [...this.history];
+    if (Array.isArray(history) && history.length > 0) {
+      const first = history.shift();
+      this.set(history);
+      return first;
+    }
+    return undefined;
+  }
 
   /**
    * @description The method to trim the history.
    * @protected
    * @param {('pop' | 'shift')} method The method `pop` or `shift` to trim the history.
-   * @returns {this} 
+   * @returns {this} The `this` current instance.
    */
   protected trim(method: 'pop' | 'shift'): this {
     if (this.#size > 0) {
       while (this.history.length > this.size) {
-        method === 'pop' ? this.history.pop() : method === 'shift' && this.history.shift();
+        method === 'pop' ? this.pop() : method === 'shift' && this.shift();
       }  
     }
     return this;
   }
+
+  /**
+   * @description "Inserts new elements at the start of an array, and returns the new length of the array."
+   * @protected
+   * @param {...readonly Value[]} items The items to insert.
+   * @returns {number} The new length.
+   */
+  protected unshift(...items: readonly Value[]): number {
+    const history = [...this.history];
+    const length = history.unshift(...items);
+    return (this.set(history), length);
+  }
+  //#endregion
 }
