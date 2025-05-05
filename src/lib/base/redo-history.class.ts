@@ -31,7 +31,7 @@ export class RedoHistory<
    */
   constructor(
     size: Size = RedoHistory.size as Size,
-    initialValue?: readonly [Value],
+    initialValue?: readonly Value[],
     data?: DataConstructorInput<readonly Value[], DataType>,
   ) {
     super(size, initialValue, data);
