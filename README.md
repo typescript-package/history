@@ -21,13 +21,19 @@ A **lightweight TypeScript** package for tracking history of values.
 - [Api](#api)
   - [`History`](#history)
   - Base
+    - [`CurrentHistory`](#currenthistory)
     - [`HistoryBase`](#historybase)
+    - [`RedoHistory`](#redohistory)
+    - [`UndoHistory`](#undohistory)
   - Core
     - [`HistoryAppend`](#historyappend)
     - [`HistoryCore`](#historycore)
     - [`HistoryCurrent`](#historycurrent)
     - [`HistoryPrepend`](#historyprepend)
     - [`HistoryStorage`](#historystorage)
+  - Type
+      [`HistoryCoreConstructor`](#historycoreconstructor)
+      [`HistoryCurrentConstructor`](#historycurrentconstructor)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Code of Conduct](#code-of-conduct)
@@ -55,16 +61,17 @@ npm install @typescript-package/history --save-peer
 ```typescript
 import {
   History,
-
   // Base.
   HistoryBase,
-
   // Core (Abstract).
   HistoryAppend,
   HistoryCore,
   HistoryCurrent,
   HistoryPrepend,
-  HistoryStorage  
+  HistoryStorage,
+  // Type.
+  HistoryCoreConstructor,
+  HistoryCurrentConstructor,
 } from '@typescript-package/history';
 ```
 
@@ -133,7 +140,7 @@ import { WeakData } from '@typescript-package/data';
 
 // Initialize.
 export const history = new class History<Type, Size extends number = number>
-  extends BaseHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
+  extends BaseHistory<Type, Size, WeakData<readonly Type[]>>{}({value: 5, size: 5}, WeakData);
 
 // Add to the history.
 history.set(10).set(15).set(20);
@@ -143,9 +150,31 @@ console.log(`history.undoHistory.data`, WeakData.get(history.undoHistory.data));
 
 ```
 
+## `CurrentHistory`
+
+```typescript
+import { CurrentHistory } from '@typescript-package/history';
+```
+
 ## `HistoryBase`
 
 The base `abstract` class to manage history.
+
+```typescript
+import { HistoryBase } from '@typescript-package/history';
+```
+
+## `RedoHistory`
+
+```typescript
+import { RedoHistory } from '@typescript-package/history';
+```
+
+## `UndoHistory`
+
+```typescript
+import { UndoHistory } from '@typescript-package/history';
+```
 
 ## `HistoryAppend`
 
@@ -183,7 +212,7 @@ import { HistoryCurrent as AbstractHistoryCurrent } from '@typescript-package/hi
 
 export class HistoryCurrent<
   Value,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > extends AbstractHistoryCurrent<Value, DataType> {
   public override get value() {
     return super.data.value[0]
@@ -191,7 +220,7 @@ export class HistoryCurrent<
   public has() {
     return super.data.value.length > 0;
   }
-  public override set(value: Value[]) {
+  public override set(value: readonly Value[]) {
     super.set(value);
     return this;
   }
@@ -254,9 +283,9 @@ import { HistoryStorage as AbstractHistoryStorage } from '@typescript-package/hi
 
 export class HistoryStorage<
   Value,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > extends AbstractHistoryStorage<Value, DataType> {
-  public override set(value: Value[]) {
+  public override set(value: readonly Value[]) {
     super.set(value);
     return this;
   }
@@ -275,6 +304,20 @@ console.log(historyStorage.length); // 3
 historyStorage.destroy();
 console.log(Object.hasOwn(historyStorage.data, 'value')); // false
 
+```
+
+## Type
+
+## `HistoryCoreConstructor`
+
+```typescript
+import { HistoryCoreConstructor } from '@typescript-package/history';
+```
+
+## `HistoryCurrentConstructor`
+
+```typescript
+import { HistoryCurrentConstructor } from '@typescript-package/history';
 ```
 
 ## Contributing
