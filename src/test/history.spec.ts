@@ -2,11 +2,14 @@ import { History as BaseHistory } from "../lib";
 import { DataCore, WeakData } from '@typescript-package/data';
 
 export let history = new class History<Type, Size extends number = number>
-  extends BaseHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5 as number}, WeakData);
+  extends BaseHistory<Type, Size, WeakData<readonly Type[]>>{}({value: 5, size: 5 as number}, WeakData);
 
 describe(`History`, () => {
   beforeEach(() => {
-    history = new class History<Type, Size extends number = number> extends BaseHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5 as number}, WeakData);
+    history = new class History<Type, Size extends number = number> extends BaseHistory<Type, Size, WeakData<readonly Type[]>>{}(
+      {value: 5, size: 5 as number},
+      WeakData
+    );
   });
 
   it(`disabled by size = 0`, () => {
@@ -236,14 +239,14 @@ describe(`History`, () => {
 });
 
 
-export class CustomData<Type> extends DataCore<Type[]> {
-  #value: Type[];
+export class CustomData<Type> extends DataCore<readonly Type[]> {
+  #value: readonly Type[];
 
   public get value() {
     return this.#value;
   }
 
-  constructor(value: Type[]) {
+  constructor(value: readonly Type[]) {
     super();
     this.#value = value;
   }
@@ -256,7 +259,7 @@ export class CustomData<Type> extends DataCore<Type[]> {
     return this;
   }
 
-  public set(value: Type[]) {
+  public set(value: readonly Type[]) {
     this.#value = value;
     // localStorage.setItem('', JSON.stringify(value));
     return this;
