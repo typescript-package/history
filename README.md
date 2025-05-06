@@ -1,4 +1,3 @@
-
 <a href="https://www.typescriptlang.org/">
   <img
     src="https://avatars.githubusercontent.com/u/189666396?s=150&u=9d55b1eb4ce258974ead76bf07ccf49ef0eb0ea7&v=4"
@@ -32,8 +31,8 @@ A **lightweight TypeScript** package for tracking history of values.
     - [`HistoryPrepend`](#historyprepend)
     - [`HistoryStorage`](#historystorage)
   - Type
-      [`HistoryCoreConstructor`](#historycoreconstructor)
-      [`HistoryCurrentConstructor`](#historycurrentconstructor)
+    - [`HistoryCoreConstructor`](#historycoreconstructor)
+    - [`HistoryCurrentConstructor`](#historycurrentconstructor)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Code of Conduct](#code-of-conduct)
@@ -74,6 +73,8 @@ import {
   HistoryCurrentConstructor,
 } from '@typescript-package/history';
 ```
+
+## Base
 
 ## `History`
 
@@ -175,6 +176,8 @@ import { RedoHistory } from '@typescript-package/history';
 ```typescript
 import { UndoHistory } from '@typescript-package/history';
 ```
+
+## Core
 
 ## `HistoryAppend`
 
