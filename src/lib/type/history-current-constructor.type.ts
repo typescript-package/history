@@ -1,4 +1,4 @@
-import { Data, DataCore, DataConstructorInput } from '@typescript-package/data';
+import { DataCore, DataConstructorInput } from '@typescript-package/data';
 // Class.
 import { HistoryCurrent } from "../core";
 /**
