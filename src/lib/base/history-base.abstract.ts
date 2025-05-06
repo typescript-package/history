@@ -162,7 +162,7 @@ export abstract class HistoryBase<
     } = {},
   ) {
     this.#current = new (current!)(arguments[0], data);
-    this.#redo = new (redo!)(size || Infinity as Size, undefined, data);
+    this.#redo = new (redo!)(size, undefined, data);
     this.#undo = new (undo!)(size, undefined, data);
   }
 
