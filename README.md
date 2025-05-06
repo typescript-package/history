@@ -1,5 +1,4 @@
-<a href="https://www.typescriptlang.org/">
-  <img
+<img
     src="https://avatars.githubusercontent.com/u/189666396?s=150&u=9d55b1eb4ce258974ead76bf07ccf49ef0eb0ea7&v=4"
     title="The typescript package enhances the development of typescript-based applications by providing well-structured, reusable, easy-to-use packages."
   />
@@ -74,9 +73,7 @@ import {
 } from '@typescript-package/history';
 ```
 
-## Base
-
-## `History`
+### `History`
 
 The class to manage the value changes.
 
@@ -151,13 +148,15 @@ console.log(`history.undoHistory.data`, WeakData.get(history.undoHistory.data));
 
 ```
 
-## `CurrentHistory`
+### Base
+
+### `CurrentHistory`
 
 ```typescript
 import { CurrentHistory } from '@typescript-package/history';
 ```
 
-## `HistoryBase`
+### `HistoryBase`
 
 The base `abstract` class to manage history.
 
@@ -165,21 +164,21 @@ The base `abstract` class to manage history.
 import { HistoryBase } from '@typescript-package/history';
 ```
 
-## `RedoHistory`
+### `RedoHistory`
 
 ```typescript
 import { RedoHistory } from '@typescript-package/history';
 ```
 
-## `UndoHistory`
+### `UndoHistory`
 
 ```typescript
 import { UndoHistory } from '@typescript-package/history';
 ```
 
-## Core
+### Core
 
-## `HistoryAppend`
+### `HistoryAppend`
 
 ```typescript
 import { HistoryAppend as AbstractHistoryAppend } from '@typescript-package/history';
@@ -202,11 +201,11 @@ console.log(historyAppend.take()); // Outputs: 227
 console.log(historyAppend.get()); // Outputs: [127]
 ```
 
-## `HistoryCore`
+### `HistoryCore`
 
 The core class for history append and prepend.
 
-## `HistoryCurrent`
+### `HistoryCurrent`
 
 The class represents the current value of the history.
 
@@ -254,7 +253,7 @@ historyCurrent.destroy();
 
 ```
 
-## `HistoryPrepend`
+### `HistoryPrepend`
 
 ```typescript
 import { HistoryPrepend as AbstractHistoryPrepend } from '@typescript-package/history';
@@ -277,7 +276,7 @@ console.log(historyPrepend.take()); // 227
 console.log(historyPrepend.get()); // [327, 127]
 ```
 
-## `HistoryStorage`
+### `HistoryStorage`
 
 The history storage of specified data.
 
@@ -309,15 +308,15 @@ console.log(Object.hasOwn(historyStorage.data, 'value')); // false
 
 ```
 
-## Type
+### Type
 
-## `HistoryCoreConstructor`
+### `HistoryCoreConstructor`
 
 ```typescript
 import { HistoryCoreConstructor } from '@typescript-package/history';
 ```
 
-## `HistoryCurrentConstructor`
+### `HistoryCurrentConstructor`
 
 ```typescript
 import { HistoryCurrentConstructor } from '@typescript-package/history';
