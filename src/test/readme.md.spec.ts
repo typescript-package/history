@@ -173,14 +173,14 @@ historyCurrent.destroy();
 
 // HistoryBase
 
-export class HistoryBase<
-  Value,
-  Size extends number = number,
-  DataType extends DataCore<Value[]> = Data<Value[]>
-> extends AbstractHistoryBase<Value, Size, DataType> {}
+// export class HistoryBase<
+//   Value,
+//   Size extends number = number,
+//   DataType extends DataCore<Value[]> = Data<Value[]>
+// > extends AbstractHistoryBase<Value, Size, DataType> {}
 
-console.group(`HistoryBase README.md`);
-const historyBase = new HistoryBase({value: 'a', size: 5});
-console.log(`HistoryBase`, historyBase);
-console.log(`get()`, historyBase.get()); // ['a']
-console.groupEnd();
+// console.group(`HistoryBase README.md`);
+// const historyBase = new HistoryBase({value: 'a', size: 5});
+// console.log(`HistoryBase`, historyBase);
+// console.log(`get()`, historyBase.get()); // ['a']
+// console.groupEnd();

@@ -1,20 +1,39 @@
-import { Data, DataCore } from "@typescript-package/data";
-import { HistoryBase as AbstractHistoryBase } from "../lib";
+import { Data, DataCore, ReadonlyData, DataConstructorInput } from '@typescript-package/data';
+import { HistoryBase as AbstractHistoryBase, HistoryCore, HistoryCurrent, HistoryPrepend } from "../lib";
+import { CurrentHistory, RedoHistory, UndoHistory } from '../lib/base';
+
 
 export class HistoryBase<
   Value,
-  Size extends number = number,
-  DataType extends DataCore<Value[]> = Data<Value[]>
-> extends AbstractHistoryBase<Value, Size, DataType> {
-}
+  Size extends number,
+  DataType extends DataCore<readonly Value[]>,
+  CurrentType extends HistoryCurrent<Value, DataType>,
+  RedoType extends HistoryCore<Value, Size, DataType>,
+  UndoType extends HistoryCore<Value, Size, DataType>,
+> extends AbstractHistoryBase<
+  Value,
+  Size,
+  DataType,
+  CurrentType,
+  RedoType,
+  UndoType
+> {}
 
 console.group(`HistoryBase`);
 describe(`HistoryBase`, () => {
-  let historyBase = new HistoryBase({size: 5 as number, value: 277 as number});
-
+  let historyBase = new HistoryBase(
+    {size: 5 as number, value: 277 as number},
+    ReadonlyData,
+    { current: CurrentHistory, redo: RedoHistory, undo: UndoHistory }
+  );
+  
   beforeEach(() => {
     // Create a new instance before each test
-    historyBase = new HistoryBase({size: 5 as number, value: 277 as number});
+    historyBase = new HistoryBase(
+      {size: 5 as number, value: 277 as number},
+      ReadonlyData,
+      { current: CurrentHistory, redo: RedoHistory, undo: UndoHistory }  
+    );
   });
 
   it(`Initial`, () => {

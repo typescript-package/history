@@ -2,22 +2,21 @@ import {
   // Class.
   Data,
   // Abstract.
-  DataCore
+  DataCore,
+  // Type.
+  DataConstructorInput,
 } from '@typescript-package/data';
-// Type.
-import { DataConstructor } from '../type';
 /**
  * @description The history storage of specified data.
  * @export
  * @abstract
  * @class HistoryStorage
  * @template Value 
- * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
- * @extends {DataCore<Value[]>}
+ * @template {DataCore<readonly Value[]>} [DataType=Data<readonly Value[]>] 
  */
 export abstract class HistoryStorage<
   Value,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > {
   /**
    * @description Returns the `string` tag representation of the `HistoryStorage` class when used in `Object.prototype.toString.call(instance)`.
@@ -30,7 +29,7 @@ export abstract class HistoryStorage<
   }
 
   /**
-   * @description
+   * @description Returns the data holder of `DataType`.
    * @public
    * @readonly
    * @type {DataType}
@@ -58,20 +57,20 @@ export abstract class HistoryStorage<
   /**
    * Creates an instance of `HistoryStorage` child class.
    * @constructor
-   * @param {Value[]} value 
-   * @param {?DataConstructor<Value, DataType>} [data] 
-   */
+   * @param {readonly Value[]} value The initial array.
+   * @param {?DataConstructorInput<readonly Value[], DataType>} [data] Custom data holder, optionally with params.
+   */ 
   constructor(
-    value: Value[],
-    data?: DataConstructor<Value, DataType>
+    value: readonly Value[],
+    data?: DataConstructorInput<readonly Value[], DataType>
   ) {
-    this.#data = data ? new data(value) : new (Data as unknown as DataConstructor<Value, DataType>)(value);
+    this.#data = new (Array.isArray(data) ? data[0] : data ?? Data)(value, ...Array.isArray(data) ? data.slice(1) : []) as DataType;
   }
 
   /**
-   * @description Destroys the storage data by setting it to `null`.
+   * @description Destroys the storage data, by default setting it to `null`.
    * @public
-   * @returns {this} Returns the current instance.
+   * @returns {this} The `this` current instance.
    */
   public destroy(): this {
     this.#data.destroy();
@@ -81,9 +80,9 @@ export abstract class HistoryStorage<
   /**
    * @description Gets the readonly history.
    * @public
-   * @returns {Readonly<Value[]>} 
+   * @returns {readonly Value[]} 
    */
-  public get(): Readonly<Value[]> {
+  public get(): readonly Value[] {
     return this.#data.value;
   }
 
@@ -99,10 +98,10 @@ export abstract class HistoryStorage<
   /**
    * @description Sets the data value.
    * @protected
-   * @param {Value[]} value The data of `Type[]` to set.
-   * @returns {this} Returns `this` current instance.
+   * @param {readonly Value[]} value The data value of `Value[]` to set.
+   * @returns {this} The `this` current instance.
    */
-  protected set(value: Value[]) {
+  protected set(value: readonly Value[]): this {
     this.#data.set(value);
     return this;
   }

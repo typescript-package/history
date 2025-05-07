@@ -1,6 +1,4 @@
-
-<a href="https://www.typescriptlang.org/">
-  <img
+<img
     src="https://avatars.githubusercontent.com/u/189666396?s=150&u=9d55b1eb4ce258974ead76bf07ccf49ef0eb0ea7&v=4"
     title="The typescript package enhances the development of typescript-based applications by providing well-structured, reusable, easy-to-use packages."
   />
@@ -21,13 +19,19 @@ A **lightweight TypeScript** package for tracking history of values.
 - [Api](#api)
   - [`History`](#history)
   - Base
+    - [`CurrentHistory`](#currenthistory)
     - [`HistoryBase`](#historybase)
+    - [`RedoHistory`](#redohistory)
+    - [`UndoHistory`](#undohistory)
   - Core
     - [`HistoryAppend`](#historyappend)
     - [`HistoryCore`](#historycore)
     - [`HistoryCurrent`](#historycurrent)
     - [`HistoryPrepend`](#historyprepend)
     - [`HistoryStorage`](#historystorage)
+  - Type
+    - [`HistoryCoreConstructor`](#historycoreconstructor)
+    - [`HistoryCurrentConstructor`](#historycurrentconstructor)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Code of Conduct](#code-of-conduct)
@@ -55,29 +59,29 @@ npm install @typescript-package/history --save-peer
 ```typescript
 import {
   History,
-
   // Base.
   HistoryBase,
-
   // Core (Abstract).
   HistoryAppend,
   HistoryCore,
   HistoryCurrent,
   HistoryPrepend,
-  HistoryStorage  
+  HistoryStorage,
+  // Type.
+  HistoryCoreConstructor,
+  HistoryCurrentConstructor,
 } from '@typescript-package/history';
 ```
 
-## `History`
+### `History`
 
 The class to manage the value changes.
 
 ```typescript
-import { History as BaseHistory } from '@typescript-package/history';
+import { History } from '@typescript-package/history';
 
 // Initialize.
-export const history = new History<Type, Size extends number = number>
-  extends BaseHistory<Type, Size>{}({value: 5, size: 5});
+export const history = new History({value: 5, size: 5});
 
 console.group(`History README.md`);
 
@@ -133,7 +137,7 @@ import { WeakData } from '@typescript-package/data';
 
 // Initialize.
 export const history = new class History<Type, Size extends number = number>
-  extends BaseHistory<Type, Size, WeakData<Type[]>>{}({value: 5, size: 5}, WeakData);
+  extends BaseHistory<Type, Size, WeakData<readonly Type[]>>{}({value: 5, size: 5}, WeakData);
 
 // Add to the history.
 history.set(10).set(15).set(20);
@@ -143,11 +147,37 @@ console.log(`history.undoHistory.data`, WeakData.get(history.undoHistory.data));
 
 ```
 
-## `HistoryBase`
+### Base
+
+### `CurrentHistory`
+
+```typescript
+import { CurrentHistory } from '@typescript-package/history';
+```
+
+### `HistoryBase`
 
 The base `abstract` class to manage history.
 
-## `HistoryAppend`
+```typescript
+import { HistoryBase } from '@typescript-package/history';
+```
+
+### `RedoHistory`
+
+```typescript
+import { RedoHistory } from '@typescript-package/history';
+```
+
+### `UndoHistory`
+
+```typescript
+import { UndoHistory } from '@typescript-package/history';
+```
+
+### Core
+
+### `HistoryAppend`
 
 ```typescript
 import { HistoryAppend as AbstractHistoryAppend } from '@typescript-package/history';
@@ -162,19 +192,19 @@ historyAppend.add(127).add(227);
 console.log(historyAppend.get()); // [127, 227]
 
 // Peek.
-console.log(`peekLast()`, historyAppend.peekLast()); // Outputs: 127
-console.log(`peekNext()`, historyAppend.peekNext()); // Outputs: 227
+console.log(`last()`, historyAppend.last()); // Outputs: 127
+console.log(`next()`, historyAppend.next()); // Outputs: 227
 
 // Take from the history.
 console.log(historyAppend.take()); // Outputs: 227
 console.log(historyAppend.get()); // Outputs: [127]
 ```
 
-## `HistoryCore`
+### `HistoryCore`
 
 The core class for history append and prepend.
 
-## `HistoryCurrent`
+### `HistoryCurrent`
 
 The class represents the current value of the history.
 
@@ -183,7 +213,7 @@ import { HistoryCurrent as AbstractHistoryCurrent } from '@typescript-package/hi
 
 export class HistoryCurrent<
   Value,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > extends AbstractHistoryCurrent<Value, DataType> {
   public override get value() {
     return super.data.value[0]
@@ -191,7 +221,7 @@ export class HistoryCurrent<
   public has() {
     return super.data.value.length > 0;
   }
-  public override set(value: Value[]) {
+  public override set(value: readonly Value[]) {
     super.set(value);
     return this;
   }
@@ -222,7 +252,7 @@ historyCurrent.destroy();
 
 ```
 
-## `HistoryPrepend`
+### `HistoryPrepend`
 
 ```typescript
 import { HistoryPrepend as AbstractHistoryPrepend } from '@typescript-package/history';
@@ -237,15 +267,15 @@ historyPrepend.add(127).add(327).add(227);
 console.log(historyPrepend.get()); // [227, 327, 127]
 
 // Peek.
-console.log(`peekLast()`, historyPrepend.peekLast()); // Outputs: 127
-console.log(`peekNext()`, historyPrepend.peekNext()); // Outputs: 227
+console.log(`last()`, historyPrepend.last()); // Outputs: 127
+console.log(`next()`, historyPrepend.next()); // Outputs: 227
 
 // Take from the history.
 console.log(historyPrepend.take()); // 227
 console.log(historyPrepend.get()); // [327, 127]
 ```
 
-## `HistoryStorage`
+### `HistoryStorage`
 
 The history storage of specified data.
 
@@ -254,9 +284,9 @@ import { HistoryStorage as AbstractHistoryStorage } from '@typescript-package/hi
 
 export class HistoryStorage<
   Value,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > extends AbstractHistoryStorage<Value, DataType> {
-  public override set(value: Value[]) {
+  public override set(value: readonly Value[]) {
     super.set(value);
     return this;
   }
@@ -275,6 +305,20 @@ console.log(historyStorage.length); // 3
 historyStorage.destroy();
 console.log(Object.hasOwn(historyStorage.data, 'value')); // false
 
+```
+
+### Type
+
+### `HistoryCoreConstructor`
+
+```typescript
+import { HistoryCoreConstructor } from '@typescript-package/history';
+```
+
+### `HistoryCurrentConstructor`
+
+```typescript
+import { HistoryCurrentConstructor } from '@typescript-package/history';
 ```
 
 ## Contributing

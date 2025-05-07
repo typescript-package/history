@@ -1,13 +1,14 @@
 import {
-  // Class.
-  Data,
   // Abstract.
-  DataCore
+  DataCore,
+  // Type.
+  DataConstructorInput,
+  ImmutableArray,
 } from '@typescript-package/data';
-// Class.
-import { CurrentHistory, RedoHistory, UndoHistory } from '.';
+// Abstract.
+import { HistoryCore, HistoryCurrent } from '../core';
 // Type.
-import { HistoryCurrentConstructor, DataConstructor, HistoryCoreConstructor } from '../type';
+import { HistoryCurrentConstructor, HistoryCoreConstructor } from '../type';
 /**
  * @description The base abstract class to manage history.
  * @export
@@ -15,12 +16,15 @@ import { HistoryCurrentConstructor, DataConstructor, HistoryCoreConstructor } fr
  * @class HistoryBase
  * @template Value 
  * @template {number} [Size=number] 
- * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
+ * @template {DataCore<readonly Value[]>} [DataType=Data<readonly Value[]>] 
  */
 export abstract class HistoryBase<
   Value,
-  Size extends number = number,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  Size extends number,
+  DataType extends DataCore<readonly Value[]>,
+  CurrentType extends HistoryCurrent<Value, DataType>,
+  RedoType extends HistoryCore<Value, Size, DataType>,
+  UndoType extends HistoryCore<Value, Size, DataType>,
 > {
   /**
    * @description The max size for undo history.
@@ -28,7 +32,7 @@ export abstract class HistoryBase<
    * @static
    * @type {number}
    */
-  public static size = Infinity;
+  public static size: number = Infinity;
 
   /**
    * @description Returns the `string` tag representation of the `HistoryBase` class when used in `Object.prototype.toString.call(instance)`.
@@ -54,9 +58,9 @@ export abstract class HistoryBase<
    * @description Returns the current history of `CurrentHistory`.
    * @public
    * @readonly
-   * @type {CurrentHistory<Value, DataType>}
+   * @type {CurrentType}
    */
-  public get currentHistory() {
+  public get currentHistory(): CurrentType {
     return this.#current;
   }
 
@@ -70,7 +74,7 @@ export abstract class HistoryBase<
    *     undo: DataType
    *   }}
    */
-  public get data() : {
+  public get data(): {
     current: DataType,
     redo: DataType,
     undo: DataType
@@ -86,9 +90,9 @@ export abstract class HistoryBase<
    * @description Returns the redo history.
    * @public
    * @readonly    
-   * @type {HistoryCore<Value, Size, DataType>}
+   * @type {RedoType}
    */
-  public get redoHistory() {
+  public get redoHistory(): RedoType {
     return this.#redo;
   }
   
@@ -96,17 +100,17 @@ export abstract class HistoryBase<
    * @description Returns the undo history.
    * @public
    * @readonly
-   * @type {HistoryCore<Value, Size, DataType>}
+   * @type {UndoType}
    */
-  public get undoHistory() {
+  public get undoHistory(): UndoType {
     return this.#undo;
   }
 
   /**
    * @description A private field to store the current value.
-   * @type {CurrentHistory<Value, DataType>}
+   * @type {CurrentType}
    */
-  #current: CurrentHistory<Value, DataType>;
+  #current: CurrentType;
 
   /**
    * @description Privately stored callback function invoked on redo.
@@ -122,15 +126,15 @@ export abstract class HistoryBase<
 
   /**
    * @description The class to manage the redo history.
-   * @type {RedoHistory}
+   * @type {RedoType}
    */
-  #redo;
+  #redo: RedoType;
 
   /**
    * @description The class to manage the undo history.
-   * @type {UndoHistory}
+   * @type {UndoType}
    */
-  #undo
+  #undo: UndoType;
 
   /**
    * Creates an instance of `HistoryBase` child class.
@@ -138,34 +142,34 @@ export abstract class HistoryBase<
    * @param {{ value?: Value, size?: Size}} [param0={}] 
    * @param {Value} param0.value 
    * @param {Size} param0.size 
-   * @param {?DataConstructor<Value, DataType>} [data] 
+   * @param {?DataConstructorInput<readonly Value[], DataType>} [data] 
    * @param {{
-   *       current?: HistoryCurrentConstructor<Value, DataType>,
-   *       redo?: HistoryCoreConstructor<Value, Size, DataType>,
-   *       undo?: HistoryCoreConstructor<Value, Size, DataType>,
+   *       current?: HistoryCurrentConstructor<Value, DataType, CurrentType>,
+   *       redo?: HistoryCoreConstructor<Value, Size, DataType, RedoType>,
+   *       undo?: HistoryCoreConstructor<Value, Size, DataType, UndoType>,
    *     }} [param1={}] 
-   * @param {HistoryCurrentConstructor<Value, DataType>} param1.current 
-   * @param {HistoryCoreConstructor<Value, Size, DataType>} param1.redo 
-   * @param {HistoryCoreConstructor<Value, Size, DataType>} param1.undo 
+   * @param {HistoryCurrentConstructor<Value, DataType, CurrentType>} param1.current 
+   * @param {HistoryCoreConstructor<Value, Size, DataType, RedoType>} param1.redo 
+   * @param {HistoryCoreConstructor<Value, Size, DataType, UndoType>} param1.undo 
    */
   constructor(
     {value, size}: { value?: Value, size?: Size} = {},
-    data?: DataConstructor<Value, DataType>,
+    data?: DataConstructorInput<readonly Value[], DataType>,
     {current, redo, undo}: {
-      current?: HistoryCurrentConstructor<Value, DataType>,
-      redo?: HistoryCoreConstructor<Value, Size, DataType>,
-      undo?: HistoryCoreConstructor<Value, Size, DataType>,
+      current?: HistoryCurrentConstructor<Value, DataType, CurrentType>,
+      redo?: HistoryCoreConstructor<Value, Size, DataType, RedoType>,
+      undo?: HistoryCoreConstructor<Value, Size, DataType, UndoType>,
     } = {},
   ) {
-    this.#current = new (current || CurrentHistory)(arguments[0], data);
-    this.#redo = new (redo || RedoHistory)(size || Infinity as Size, data);
-    this.#undo = new (undo || UndoHistory)(size, data);
+    this.#current = new (current!)(arguments[0], data);
+    this.#redo = new (redo!)(size, undefined, data);
+    this.#undo = new (undo!)(size, undefined, data);
   }
 
   /**
    * @description Clears the `current`, `undo` and `redo` history.
    * @public
-   * @returns {this} The current instance.
+   * @returns {this} The `this` current instance.
    */
   public clear(): this {
     this.#current.clear();
@@ -177,7 +181,7 @@ export abstract class HistoryBase<
   /**
    * @description Destroys the history of this instance.
    * @public
-   * @returns {this} The current instance.
+   * @returns {this} The `this` current instance.
    */
   public destroy(): this {
     this.clear();
@@ -191,9 +195,9 @@ export abstract class HistoryBase<
   /**
    * @description Gets the current, undo and redo history.
    * @public
-   * @returns {{ current: Readonly<Value>, undo: Readonly<Value[]>; redo: Readonly<Value[]> }} 
+   * @returns {{ current: Readonly<Value>, undo: ImmutableArray<Value>; redo: ImmutableArray<Value> }} 
    */
-  public get(): { current: Readonly<Value>, undo: Readonly<Value[]>; redo: Readonly<Value[]> } {
+  public get(): { current: Readonly<Value>, undo: ImmutableArray<Value>; redo: ImmutableArray<Value> } {
     return {
       current: this.#current.value,
       undo: this.#undo.get(),
@@ -205,9 +209,9 @@ export abstract class HistoryBase<
    * @description The instance method returns read-only redo history.
    * @public
    * @template Type
-   * @returns {(Readonly<Value[]> | undefined)} 
+   * @returns {(ImmutableArray<Value>)} 
    */
-  public getRedo(): Readonly<Value[]> | undefined {
+  public getRedo(): ImmutableArray<Value> {
     return this.#redo.get();
   }
 
@@ -215,9 +219,9 @@ export abstract class HistoryBase<
    * @description The instance method returns read-only undo history.
    * @public
    * @template Type 
-   * @returns {(Readonly<Value[]> | undefined)} 
+   * @returns {(ImmutableArray<Value>)} 
    */
-  public getUndo(): Readonly<Value[]> | undefined {
+  public getUndo(): ImmutableArray<Value> {
     return this.#undo.get();
   }
   //#endregion
@@ -227,7 +231,7 @@ export abstract class HistoryBase<
    * @public
    * @returns {boolean} 
    */
-  public hasCurrent() {
+  public hasCurrent(): boolean {
     return this.#current.has();
   }
 
@@ -348,18 +352,14 @@ export abstract class HistoryBase<
    * @description Pick the current, redo or undo history.
    * @public
    * @param {('current' | 'redo' | 'undo')} type 
-   * @returns {Readonly<Value[]>} 
+   * @returns {ImmutableArray<Value>} 
    */
-  public pick(type: 'current' | 'redo' | 'undo'): Readonly<Value[]> {
+  public pick(type: 'current' | 'redo' | 'undo'): ImmutableArray<Value> {
     switch(type) {
-      case 'current':
-        return this.#current.get();
-      case 'redo':
-        return this.#redo.get();
-      case 'undo':
-        return this.#undo.get();
-      default:
-        throw new Error(`Invalid type: ${type}. Expected 'current', 'redo', or 'undo'.`);
+      case 'current': return this.#current.get();
+      case 'redo': return this.#redo.get();
+      case 'undo': return this.#undo.get();
+      default: throw new Error(`Invalid type: ${type}. Expected 'current', 'redo', or 'undo'.`);
     }
   }
 
@@ -383,7 +383,7 @@ export abstract class HistoryBase<
    * @description Sets a new value and updates the undo history.
    * @public
    * @param {Value} value 
-   * @returns {this} The current instance.
+   * @returns {this} The `this` current instance.
    */
   public set(value: Value): this {
     this.#current.has() && this.#undo.add(this.#current.value);

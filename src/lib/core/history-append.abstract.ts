@@ -2,12 +2,12 @@ import {
   // Class.
   Data,
   // Abstract.
-  DataCore
+  DataCore,
+  // Type.
+  DataConstructorInput,
 } from '@typescript-package/data';
 // Abstract.
 import { HistoryCore } from './history-core.abstract';
-// Type.
-import { DataConstructor } from '../type';
 /**
  * @description Class extends the `HistoryCore` class to maintain a history of values in a append manner.
  * This means that new entries are added to the end of the history, and as the history exceeds its size limit, entries from the beginning are removed.
@@ -21,13 +21,13 @@ import { DataConstructor } from '../type';
  * @class HistoryAppend
  * @template Value 
  * @template {number} [Size=number] 
- * @template {DataCore<Value[]>} [DataType=Data<Value[]>] 
+ * @template {DataCore<readonly Value[]>} [DataType=Data<readonly Value[]>] 
  * @extends {HistoryCore<Value, Size, DataType>}
  */
 export abstract class HistoryAppend<
   Value,
   Size extends number = number,
-  DataType extends DataCore<Value[]> = Data<Value[]>
+  DataType extends DataCore<readonly Value[]> = Data<readonly Value[]>
 > extends HistoryCore<Value, Size, DataType> {
   /**
    * @description The default value of maximum history size.
@@ -35,7 +35,7 @@ export abstract class HistoryAppend<
    * @static
    * @type {number}
    */
-  public static size = 10;
+  public static size: number = 10;
 
   /**
    * @description Returns the `string` tag representation of the `HistoryAppend` class when used in `Object.prototype.toString.call(instance)`.
@@ -50,14 +50,17 @@ export abstract class HistoryAppend<
   /**
    * Creates an instance of `HistoryAppend` child class.
    * @constructor
-   * @param {Size} [size=HistoryAppend.size as Size] 
-   * @param {?DataConstructor<Value, DataType>} [data] 
+   * @param {Size} [size=HistoryAppend.size as Size] The maximum history size.
+   * @param {?readonly Value[]} [initialValue] Initial value to add.
+   * @param {?DataConstructorInput<readonly Value[], DataType>} [data] Custom data holder.
    */
   constructor(
     size: Size = HistoryAppend.size as Size,
-    data?: DataConstructor<Value, DataType>
+    initialValue?: readonly Value[],
+    data?: DataConstructorInput<readonly Value[], DataType>,
   ) {
     super(size, data);
+    Array.isArray(initialValue) && initialValue.forEach(value => this.add(value));
   }
 
   /**
@@ -65,11 +68,11 @@ export abstract class HistoryAppend<
    * - FIFO unshift/queue style
    * @public
    * @param {Value} value The value to store.
-   * @returns {this} The current instance.
+   * @returns {this} The `this` current instance.
    */
   public add(value: Value): this {
     if (super.size > 0) {
-      super.history.push(value);
+      super.push(value);
       super.trim('shift');
     }
     return this;
@@ -81,7 +84,7 @@ export abstract class HistoryAppend<
    * @returns {(Value | undefined)} 
    */
   public newest(): Value | undefined {
-    return this.last();
+    return super.last();
   }
 
   /**
@@ -110,6 +113,6 @@ export abstract class HistoryAppend<
    * @returns {(Value | undefined)} 
    */
   public take(): Value | undefined {
-    return super.history.pop();
+    return super.pop();
   }
 }

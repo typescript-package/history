@@ -1,6 +1,6 @@
 {
   "name": "@typescript-package/history",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "wwwdev.io <dev@wwwdev.io>",
   "description": "A lightweight TypeScript package for tracking the history of values.",
   "license": "MIT",
@@ -9,7 +9,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "peerDependencies": {
-    "@typescript-package/data": "^2.0.0"
+    "@typescript-package/data": "^5.0.0"
   },
   "scripts": {
     "prepublishOnly": "npm run pkg && npm run clean",
@@ -26,11 +26,16 @@
   "keywords": [
     "@typescript-package",
     "@typescript-package/history",
-    "HistoryAppend",
-    "HistoryPrepend",
+    "CurrentHistory",
     "History",
+    "HistoryAppend",
+    "HistoryBase",
+    "HistoryPrepend",
+    "HistoryStorage",
+    "Redo",
+    "RedoHistory",
     "Undo",
-    "Redo"
+    "UndoHistory"
   ],
   "funding": [
     {
