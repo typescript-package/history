@@ -26,11 +26,16 @@
   "keywords": [
     "@typescript-package",
     "@typescript-package/history",
-    "HistoryAppend",
-    "HistoryPrepend",
+    "CurrentHistory",
     "History",
+    "HistoryAppend",
+    "HistoryBase",
+    "HistoryPrepend",
+    "HistoryStorage",
+    "Redo",
+    "RedoHistory",
     "Undo",
-    "Redo"
+    "UndoHistory"
   ],
   "funding": [
     {
