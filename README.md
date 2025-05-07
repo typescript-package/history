@@ -78,11 +78,10 @@ import {
 The class to manage the value changes.
 
 ```typescript
-import { History as BaseHistory } from '@typescript-package/history';
+import { History } from '@typescript-package/history';
 
 // Initialize.
-export const history = new History<Type, Size extends number = number>
-  extends BaseHistory<Type, Size>{}({value: 5, size: 5});
+export const history = new History({value: 5, size: 5});
 
 console.group(`History README.md`);
 
@@ -193,8 +192,8 @@ historyAppend.add(127).add(227);
 console.log(historyAppend.get()); // [127, 227]
 
 // Peek.
-console.log(`peekLast()`, historyAppend.peekLast()); // Outputs: 127
-console.log(`peekNext()`, historyAppend.peekNext()); // Outputs: 227
+console.log(`last()`, historyAppend.last()); // Outputs: 127
+console.log(`next()`, historyAppend.next()); // Outputs: 227
 
 // Take from the history.
 console.log(historyAppend.take()); // Outputs: 227
@@ -268,8 +267,8 @@ historyPrepend.add(127).add(327).add(227);
 console.log(historyPrepend.get()); // [227, 327, 127]
 
 // Peek.
-console.log(`peekLast()`, historyPrepend.peekLast()); // Outputs: 127
-console.log(`peekNext()`, historyPrepend.peekNext()); // Outputs: 227
+console.log(`last()`, historyPrepend.last()); // Outputs: 127
+console.log(`next()`, historyPrepend.next()); // Outputs: 227
 
 // Take from the history.
 console.log(historyPrepend.take()); // 227
